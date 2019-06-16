@@ -88,22 +88,20 @@ RubyDoc.versions = [
   '1.8.6'
 ];
 
-document.addEventListener("DOMContentLoaded", function () {
-  var rubydoc = new RubyDoc(document);
+var rubydoc = new RubyDoc(document);
 
-  var input = document.createElement('input');
-  input.setAttribute('list', rubydoc.versions.id);
-  input.setAttribute('autocomplete', 'off');
-  input.setAttribute('placeholder', 'Ruby version');
+var input = document.createElement('input');
+input.setAttribute('list', rubydoc.versions.id);
+input.setAttribute('autocomplete', 'off');
+input.setAttribute('placeholder', 'Ruby version');
 
-  input.addEventListener('change', function (event) {
-    rubydoc.changeVersion(event.target.value);
-  });
-
-  var widget = document.createElement('li');
-  widget.className = 'grid-2 right';
-  widget.appendChild(input);
-
-  var rd_action_search = document.querySelector('#rd-action-search');
-  rd_action_search.parentNode.insertBefore(widget, rd_action_search);
+input.addEventListener('change', function (event) {
+  rubydoc.changeVersion(event.target.value);
 });
+
+var widget = document.createElement('li');
+widget.className = 'grid-2 right';
+widget.appendChild(input);
+
+var rd_action_search = document.querySelector('#rd-action-search');
+rd_action_search.parentNode.insertBefore(widget, rd_action_search);
