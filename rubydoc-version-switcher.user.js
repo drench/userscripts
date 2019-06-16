@@ -107,9 +107,6 @@ input.addEventListener('change', function (event) {
   rubydoc.changeVersion(event.target.value);
 });
 
-// Style this new input field like the search box
-input.style.cssText = document.defaultView.getComputedStyle(rd_action_search, '').cssText
-
 var widget = document.createElement('li');
 widget.className = 'grid-2 right';
 widget.appendChild(input);
