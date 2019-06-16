@@ -94,6 +94,10 @@ RubyDoc.versions = [
 
 var rubydoc = new RubyDoc(document);
 
+var rd_action_search = document.querySelector('#rd-action-search');
+if (!rd_action_search)
+  return console.log('Cannot find the #rd-action-search element!');
+
 var input = document.createElement('input');
 input.setAttribute('list', rubydoc.versions.id);
 input.setAttribute('autocomplete', 'off');
@@ -103,9 +107,11 @@ input.addEventListener('change', function (event) {
   rubydoc.changeVersion(event.target.value);
 });
 
+// Style this new input field like the search box
+input.style.cssText = document.defaultView.getComputedStyle(rd_action_search, '').cssText
+
 var widget = document.createElement('li');
 widget.className = 'grid-2 right';
 widget.appendChild(input);
 
-var rd_action_search = document.querySelector('#rd-action-search');
 rd_action_search.parentNode.insertBefore(widget, rd_action_search);
