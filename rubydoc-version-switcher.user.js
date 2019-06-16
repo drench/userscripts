@@ -102,6 +102,7 @@ var input = document.createElement('input');
 input.setAttribute('list', rubydoc.versions.id);
 input.setAttribute('autocomplete', 'off');
 input.setAttribute('placeholder', 'Ruby version');
+input.style.height = document.defaultView.getComputedStyle(rd_action_search, '').height;
 
 input.addEventListener('change', function (event) {
   rubydoc.changeVersion(event.target.value);
