@@ -108,7 +108,8 @@ input.setAttribute('placeholder', 'Ruby version…');
 input.style.height = '1.3em';
 
 input.addEventListener('change', function (event) {
-  var newpath = rubydoc.pageForVersion(event.target.value);
+  var number = event.target.value.replace(/\s+/g, '');
+  var newpath = rubydoc.pageForVersion(number);
   if (newpath)
     document.location.pathname = newpath;
 });
