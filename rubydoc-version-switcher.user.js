@@ -7,7 +7,7 @@
 class RubyDoc {
   constructor(doc) {
     this.doc = doc;
-    var pathmatch = this.pathname.match(/^\/(stdlib|core)-([1-9]\.[0-9.]+)/);
+    var pathmatch = this.pathname.match(/^\/(stdlib|core)-([1-9]\.[0-9\.]+)/);
     // TODO: make this work on stdlib pages
     this.category = pathmatch[1];
     this.version = pathmatch[2];
