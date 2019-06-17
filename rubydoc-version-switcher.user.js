@@ -119,3 +119,10 @@ widget.className = 'grid-2 right';
 widget.appendChild(input);
 
 rd_action_search.parentNode.insertBefore(widget, rd_action_search);
+
+var actionbar = document.querySelector('#actionbar');
+if (actionbar) {
+  actionbar.style.position = 'fixed';
+  actionbar.style.top = '0px';
+  actionbar.style.zIndex = '9999';
+}
