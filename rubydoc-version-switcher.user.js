@@ -15,25 +15,26 @@ class RubyDoc {
 
   get pathname() { return this.doc.location.pathname }
   get page() { return this.pathname.replace(/^\/[^\/]+/, '') }
-  pageForVersion(number) { return `/${this.category}-${number}${this.page}` }
 
-  changeVersion(number) {
+  pageForVersion(number) {
     if (RubyDoc.versions.includes(number))
-      this.doc.location.pathname = this.pageForVersion(number);
+      return `/${this.category}-${number}${this.page}`;
+    else
+      return console.log(`${number} is not a Ruby version we know about`);
   }
 
   get versions () {
     if (this.versionsDatalist) return this.versionsDatalist;
 
-    var dl = document.createElement('datalist');
+    var doc = this.doc;
+    var dl = doc.createElement('datalist');
     dl.setAttribute('id', 'ruby_versions');
     RubyDoc.versions.forEach(function (version) {
-      var opt = document.createElement('option');
+      var opt = doc.createElement('option');
       opt.innerText = version;
       dl.appendChild(opt);
     });
 
-    this.doc.body.appendChild(dl);
     this.versionsDatalist = dl;
     return this.versionsDatalist;
   }
@@ -98,14 +99,18 @@ var rd_action_search = document.querySelector('#rd-action-search');
 if (!rd_action_search)
   return console.log('Cannot find the #rd-action-search element!');
 
+document.body.appendChild(rubydoc.versions);
+
 var input = document.createElement('input');
 input.setAttribute('list', rubydoc.versions.id);
 input.setAttribute('autocomplete', 'off');
-input.setAttribute('placeholder', 'Ruby version …');
+input.setAttribute('placeholder', 'Ruby version…');
 input.style.height = '1.3em';
 
 input.addEventListener('change', function (event) {
-  rubydoc.changeVersion(event.target.value);
+  var newpath = rubydoc.pageForVersion(event.target.value);
+  if (newpath)
+    document.location.pathname = newpath;
 });
 
 var widget = document.createElement('li');
