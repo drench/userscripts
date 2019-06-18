@@ -126,3 +126,33 @@ if (actionbar) {
   actionbar.style.top = '0px';
   actionbar.style.zIndex = '9999';
 }
+
+var anchorElements = Array.from(document.querySelectorAll('a[name^=method-]'));
+var currentAnchor = undefined;
+var topAnchors = function() {
+  return anchorElements.
+      map(e => ({ "el": e, "top": e.getBoundingClientRect().top })).
+      sort(function (a, b) {
+        if (a.top > b.top)
+          return 1;
+        if (a.top < b.top)
+          return -1;
+        return 0;
+      }).
+      filter(o => o.top > 0 && o.top < 200).
+      map(a => a.el);
+};
+
+var updateHeading = function() {
+  var topAnchor = topAnchors()[0];
+  if (topAnchor && currentAnchor != topAnchor) {
+    currentAnchor = topAnchor;
+    history.pushState(null, null, `#${currentAnchor.name}`);
+  }
+  else if (currentAnchor && window.scrollY == 0) {
+    currentAnchor = undefined;
+    history.pushState(null, null, window.location.pathname + window.location.search);
+  }
+};
+
+window.addEventListener('scroll', updateHeading);
