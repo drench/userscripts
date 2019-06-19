@@ -156,3 +156,25 @@ var updateHeading = function() {
 };
 
 window.addEventListener('scroll', updateHeading);
+
+document.querySelectorAll('#file-metadata .in-file').forEach(function (li) {
+  var tag = `v${rubydoc.version.replace(/\./g, '_')}`;
+  var baseUrl = `https://github.com/ruby/ruby/tree/${tag}`;
+  var url;
+
+  if (li.innerText.match(/\.rb$/)) {
+    url = `${baseUrl}/lib/${li.innerText}`;
+  }
+  else if (li.innerText.match(/\.c$/)) {
+    url = `${baseUrl}/${li.innerText}`;
+  }
+  else
+    return;
+
+  var a = document.createElement('a');
+  a.href = url;
+  a.target = '_blank';
+  a.innerText = li.innerText;
+  li.innerText = '';
+  li.appendChild(a);
+});
