@@ -42,5 +42,20 @@ document.querySelectorAll('meta[property="og:title"]').forEach(function (metaTag
   profile.insertBefore(makeSearchElement('allmusic.com', artist, title), profileEnd);
 
   profile.insertBefore(makeSearchHead(), profileEnd);
+  profile.insertBefore(makeSearchElement('amazon.com', artist, title), profileEnd);
+
+  profile.insertBefore(makeSearchHead(), profileEnd);
+  profile.insertBefore(makeSearchElement('deepdiscount.com', artist, title), profileEnd);
+
+  profile.insertBefore(makeSearchHead(), profileEnd);
+  profile.insertBefore(makeSearchElement('ebay.com', artist, title), profileEnd);
+
+  profile.insertBefore(makeSearchHead(), profileEnd);
   profile.insertBefore(makeSearchElement('rateyourmusic.com', artist, title), profileEnd);
+
+  profile.insertBefore(makeSearchHead(), profileEnd);
+  profile.insertBefore(makeSearchElement('stevehoffman.tv', artist, title), profileEnd);
+
+  profile.insertBefore(makeSearchHead(), profileEnd);
+  profile.insertBefore(makeSearchElement('en.wikipedia.org', artist, title), profileEnd);
 });
