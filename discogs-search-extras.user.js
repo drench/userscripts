@@ -4,10 +4,11 @@
 // @include       https://www.discogs.com/*
 // ==/UserScript==
 
-const makeSearchElement = function(domain, query) {
+const makeSearchElement = function(domain, artist, title) {
   var div = document.createElement('div');
   var a = document.createElement('a');
-  var href = `https://duckduckgo.com/?q=site:${domain}+"${encodeURIComponent(query)}"`;
+  var query = `"${encodeURIComponent(artist)}"+"${encodeURIComponent(title)}"`;
+  var href = `https://duckduckgo.com/?q=site:${domain}+${query}`;
   a.setAttribute('href', href);
   a.setAttribute('target', '_blank');
   a.innerText = domain;
@@ -25,7 +26,11 @@ const makeSearchHead = function() {
 
 document.querySelectorAll('meta[property="og:title"]').forEach(function (metaTag) {
   var ogTitle = metaTag.getAttribute('content');
-  if (!ogTitle.match(/\w+/)) return;
+  var m = ogTitle.match(/^(.+) - (.+)$/);
+  if (!m) return;
+
+  var artist = m[1];
+  var title = m[2];
 
   var profile = document.querySelector('#page_content .body .profile');
   if (!profile) return;
@@ -34,8 +39,8 @@ document.querySelectorAll('meta[property="og:title"]').forEach(function (metaTag
   if (!profileEnd) return;
 
   profile.insertBefore(makeSearchHead(), profileEnd);
-  profile.insertBefore(makeSearchElement('allmusic.com', ogTitle), profileEnd);
+  profile.insertBefore(makeSearchElement('allmusic.com', artist, title), profileEnd);
 
   profile.insertBefore(makeSearchHead(), profileEnd);
-  profile.insertBefore(makeSearchElement('rateyourmusic.com', ogTitle), profileEnd);
+  profile.insertBefore(makeSearchElement('rateyourmusic.com', artist, title), profileEnd);
 });
