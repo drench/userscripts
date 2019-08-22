@@ -15,6 +15,12 @@ class SearchSite {
     var doc = this.doc;
     var ss = doc.createElement('select');
     ss.setAttribute('id', 'search_sites');
+
+    var placeholder = doc.createElement('option');
+    placeholder.value = '';
+    placeholder.innerText = 'choose…';
+    ss.appendChild(placeholder);
+
     SearchSite.sites.forEach(function (site) {
       var opt = doc.createElement('option');
       opt.innerText = site;
@@ -63,7 +69,9 @@ document.querySelectorAll('meta[property="og:title"]').forEach(function (metaTag
 
   searchSite.searchSelect.addEventListener('change', function (event) {
     var domain = event.target.value;
-    window.open(`https://duckduckgo.com/?q=site:${domain}+${query}`);
+    if (domain.length > 0) {
+      window.open(`https://duckduckgo.com/?q=site:${domain}+${query}`);
+    }
   });
 
   profile.insertBefore(makeSearchHead(), profileEnd);
