@@ -9,20 +9,21 @@ class SearchSite {
     this.doc = doc;
   }
 
-  get domains () {
-    if (this.domainsDatalist) return this.domainsDatalist;
+  get searchSelect () {
+    if (this.selectElement) return this.selectElement;
 
     var doc = this.doc;
-    var dl = doc.createElement('datalist');
-    dl.setAttribute('id', 'search_sites');
+    var ss = doc.createElement('select');
+    ss.setAttribute('id', 'search_sites');
     SearchSite.sites.forEach(function (site) {
       var opt = doc.createElement('option');
       opt.innerText = site;
-      dl.appendChild(opt);
+      opt.value = site;
+      ss.appendChild(opt);
     });
 
-    this.domainsDatalist = dl;
-    return this.domainsDatalist;
+    this.selectElement = ss;
+    return this.selectElement;
   }
 }
 
@@ -58,22 +59,13 @@ document.querySelectorAll('meta[property="og:title"]').forEach(function (metaTag
   if (!profileEnd) return;
 
   var searchSite = new SearchSite(document);
-  document.body.appendChild(searchSite.domains);
-
-  var input = document.createElement('input');
-  input.setAttribute('list', searchSite.domains.id);
-  input.setAttribute('autocomplete', 'off');
-  input.setAttribute('placeholder', 'Site…');
-
   var query = `"${encodeURIComponent(artist)}"+"${encodeURIComponent(title)}"`;
 
-  input.addEventListener('change', function (event) {
-    var domain = event.target.value.replace(/\s+/g, '');
-    if (domain.match(/.+\..+/)) {
-      window.open(`https://duckduckgo.com/?q=site:${domain}+${query}`);
-    }
+  searchSite.searchSelect.addEventListener('change', function (event) {
+    var domain = event.target.value;
+    window.open(`https://duckduckgo.com/?q=site:${domain}+${query}`);
   });
 
   profile.insertBefore(makeSearchHead(), profileEnd);
-  profile.insertBefore(input, profileEnd);
+  profile.insertBefore(searchSite.searchSelect, profileEnd);
 });
