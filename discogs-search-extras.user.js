@@ -4,18 +4,37 @@
 // @include       https://www.discogs.com/*
 // ==/UserScript==
 
-const makeSearchElement = function(domain, artist, title) {
-  var div = document.createElement('div');
-  var a = document.createElement('a');
-  var query = `"${encodeURIComponent(artist)}"+"${encodeURIComponent(title)}"`;
-  var href = `https://duckduckgo.com/?q=site:${domain}+${query}`;
-  a.setAttribute('href', href);
-  a.setAttribute('target', '_blank');
-  a.innerText = domain;
-  div.className = 'content';
-  div.appendChild(a);
-  return div;
-};
+class SearchSite {
+  constructor(doc) {
+    this.doc = doc;
+  }
+
+  get domains () {
+    if (this.domainsDatalist) return this.domainsDatalist;
+
+    var doc = this.doc;
+    var dl = doc.createElement('datalist');
+    dl.setAttribute('id', 'search_sites');
+    SearchSite.sites.forEach(function (site) {
+      var opt = doc.createElement('option');
+      opt.innerText = site;
+      dl.appendChild(opt);
+    });
+
+    this.domainsDatalist = dl;
+    return this.domainsDatalist;
+  }
+}
+
+SearchSite.sites = [
+  'allmusic.com',
+  'amazon.com',
+  'deepdiscount.com',
+  'ebay.com',
+  'rateyourmusic.com',
+  'stevehoffman.tv',
+  'en.wikipedia.org',
+];
 
 const makeSearchHead = function() {
   var head = document.createElement('div');
@@ -38,24 +57,23 @@ document.querySelectorAll('meta[property="og:title"]').forEach(function (metaTag
   var profileEnd = profile.querySelector('.clear_left');
   if (!profileEnd) return;
 
-  profile.insertBefore(makeSearchHead(), profileEnd);
-  profile.insertBefore(makeSearchElement('allmusic.com', artist, title), profileEnd);
+  var searchSite = new SearchSite(document);
+  document.body.appendChild(searchSite.domains);
+
+  var input = document.createElement('input');
+  input.setAttribute('list', searchSite.domains.id);
+  input.setAttribute('autocomplete', 'off');
+  input.setAttribute('placeholder', 'Site…');
+
+  var query = `"${encodeURIComponent(artist)}"+"${encodeURIComponent(title)}"`;
+
+  input.addEventListener('change', function (event) {
+    var domain = event.target.value.replace(/\s+/g, '');
+    if (domain.match(/.+\..+/)) {
+      window.open(`https://duckduckgo.com/?q=site:${domain}+${query}`);
+    }
+  });
 
   profile.insertBefore(makeSearchHead(), profileEnd);
-  profile.insertBefore(makeSearchElement('amazon.com', artist, title), profileEnd);
-
-  profile.insertBefore(makeSearchHead(), profileEnd);
-  profile.insertBefore(makeSearchElement('deepdiscount.com', artist, title), profileEnd);
-
-  profile.insertBefore(makeSearchHead(), profileEnd);
-  profile.insertBefore(makeSearchElement('ebay.com', artist, title), profileEnd);
-
-  profile.insertBefore(makeSearchHead(), profileEnd);
-  profile.insertBefore(makeSearchElement('rateyourmusic.com', artist, title), profileEnd);
-
-  profile.insertBefore(makeSearchHead(), profileEnd);
-  profile.insertBefore(makeSearchElement('stevehoffman.tv', artist, title), profileEnd);
-
-  profile.insertBefore(makeSearchHead(), profileEnd);
-  profile.insertBefore(makeSearchElement('en.wikipedia.org', artist, title), profileEnd);
+  profile.insertBefore(input, profileEnd);
 });
