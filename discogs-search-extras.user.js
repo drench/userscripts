@@ -36,8 +36,10 @@ class SearchSite {
 SearchSite.sites = [
   'allmusic.com',
   'amazon.com',
+  'bandcamp.com',
   'deepdiscount.com',
   'ebay.com',
+  'popsike.com',
   'rateyourmusic.com',
   'stevehoffman.tv',
   'en.wikipedia.org',
