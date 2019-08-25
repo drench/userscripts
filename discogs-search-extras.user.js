@@ -57,7 +57,7 @@ document.querySelectorAll('meta[property="og:title"]').forEach(function (metaTag
   var m = ogTitle.match(/^(.+) - (.+)$/);
   if (!m) return;
 
-  var artist = m[1];
+  var artist = m[1].replace(/\s+\(\d+\)$/, '');
   var title = m[2];
 
   var profile = document.querySelector('#page_content .body .profile');
