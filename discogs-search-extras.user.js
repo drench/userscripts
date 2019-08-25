@@ -18,7 +18,7 @@ class SearchSite {
 
     var placeholder = doc.createElement('option');
     placeholder.value = '';
-    placeholder.innerText = 'choose…';
+    placeholder.innerText = 'Search for this on…';
     ss.appendChild(placeholder);
 
     SearchSite.sites.forEach(function (site) {
@@ -46,7 +46,7 @@ SearchSite.sites = [
 const makeSearchHead = function() {
   var head = document.createElement('div');
   head.className = 'head';
-  head.innerText = 'Search:';
+  head.innerHTML = '&nbsp;';
   return head;
 };
 
