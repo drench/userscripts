@@ -39,6 +39,7 @@ SearchSite.sites = [
   'bandcamp.com',
   'deepdiscount.com',
   'ebay.com',
+  'forcedexposure.com',
   'popsike.com',
   'rateyourmusic.com',
   'stevehoffman.tv',
