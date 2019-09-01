@@ -43,6 +43,7 @@ SearchSite.sites = [
   'rateyourmusic.com',
   'stevehoffman.tv',
   'en.wikipedia.org',
+  'youtube.com'
 ];
 
 const makeSearchHead = function() {
