@@ -1,7 +1,8 @@
 // ==UserScript==
-// @name          FindAGrave Extras
-// @description	  Adds links to FindAGrave pages
-// @include       https://www.findagrave.com/memorial/*
+// @name        FindAGrave Extras
+// @description Adds links to FindAGrave pages
+// @include     https://www.findagrave.com/memorial/*
+// @run-at      document-end
 // ==/UserScript==
 
 if (findagrave) {
