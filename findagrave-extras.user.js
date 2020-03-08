@@ -5,7 +5,7 @@
 // @run-at      document-end
 // ==/UserScript==
 
-if (findagrave) {
+if (typeof findagrave !== 'undefined') {
   var memorialElement = document.getElementById('memNumberLabel');
   if (memorialElement) {
     var familySearchLink = document.createElement('a');
