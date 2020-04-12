@@ -1,6 +1,6 @@
 // ==UserScript==
-// @name          Discogs Search Extras
-// @description	  Adds search links to Discogs pages
+// @name          Discogs Extras
+// @description   Adds search links to Discogs pages and more
 // @include       https://www.discogs.com/*
 // ==/UserScript==
 
@@ -81,4 +81,47 @@ document.querySelectorAll('meta[property="og:title"]').forEach(function (metaTag
 
   profile.insertBefore(makeSearchHead(), profileEnd);
   profile.insertBefore(searchSite.searchSelect, profileEnd);
+});
+
+document.querySelectorAll('table.playlist').forEach(function (playlistTable) {
+  var durations = Array.from(playlistTable.querySelectorAll('.tracklist_track_duration span'));
+  var seconds = durations
+    .map((s)=> s.innerText.split(/:/, 2).map((t)=> parseInt(t), 10))
+    .map((t)=> isNaN(t[0]) ? 0 : (t[0]*60 + t[1]))
+    .reduce((a,c)=> a+c);
+
+  if (isNaN(seconds) || seconds < 1) return;
+
+  var minutes = Math.floor(seconds / 60);
+  seconds = seconds - (minutes * 60);
+
+  if (seconds < 10) seconds = `0${seconds}`;
+
+  if (minutes > 60) {
+    var hours = Math.floor(minutes / 60);
+    minutes = minutes - (hours * 60);
+    if (minutes < 10) minutes = `${hours}:0${minutes}`;
+    else minutes = `${hours}:${minutes}`
+  }
+
+  var playlistColumns = playlistTable.querySelector('tr').querySelectorAll('td').length;
+
+  var footer = document.createElement('tfoot');
+  var tr = document.createElement('tr');
+  tr.className = 'tracklist_track track_heading';
+
+  // Pad a column on pages with track numbers
+  if (playlistColumns == 3) tr.appendChild(document.createElement('td'));
+
+  var labelElement = document.createElement('td');
+  labelElement.className = 'tracklist_track_title';
+  labelElement.innerHTML = '<span>Total Time</span>';
+  tr.appendChild(labelElement);
+
+  var sumElement = document.createElement('td');
+  sumElement.innerHTML = `<span>${minutes}:${seconds}</span>`;
+  sumElement.className = 'tracklist_track_duration';
+  tr.appendChild(sumElement);
+  footer.appendChild(tr);
+  playlistTable.appendChild(footer);
 });
