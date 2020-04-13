@@ -83,6 +83,20 @@ document.querySelectorAll('meta[property="og:title"]').forEach(function (metaTag
   profile.insertBefore(searchSite.searchSelect, profileEnd);
 });
 
+var zeroPad = (n) => (n < 10) ? `0${n}` : `${n}`;
+
+var hhmmss = function(seconds) {
+  var minutes = Math.floor(seconds / 60);
+  seconds = seconds - (minutes * 60);
+
+  var hours = Math.floor(minutes / 60);
+
+  if (hours < 1) return `${minutes}:${zeroPad(seconds)}`;
+
+  minutes = minutes - (hours * 60);
+  return `${hours}:${zeroPad(minutes)}:${zeroPad(seconds)}`;
+};
+
 document.querySelectorAll('table.playlist').forEach(function (playlistTable) {
   var durations = Array.from(playlistTable.querySelectorAll('.tracklist_track_duration span'));
   var seconds = durations
@@ -91,18 +105,6 @@ document.querySelectorAll('table.playlist').forEach(function (playlistTable) {
     .reduce((a,c)=> a+c);
 
   if (isNaN(seconds) || seconds < 1) return;
-
-  var minutes = Math.floor(seconds / 60);
-  seconds = seconds - (minutes * 60);
-
-  if (seconds < 10) seconds = `0${seconds}`;
-
-  if (minutes > 60) {
-    var hours = Math.floor(minutes / 60);
-    minutes = minutes - (hours * 60);
-    if (minutes < 10) minutes = `${hours}:0${minutes}`;
-    else minutes = `${hours}:${minutes}`
-  }
 
   var playlistColumns = playlistTable.querySelector('tr').querySelectorAll('td').length;
 
@@ -119,7 +121,7 @@ document.querySelectorAll('table.playlist').forEach(function (playlistTable) {
   tr.appendChild(labelElement);
 
   var sumElement = document.createElement('td');
-  sumElement.innerHTML = `<span>${minutes}:${seconds}</span>`;
+  sumElement.innerHTML = `<span>${hhmmss(seconds)}</span>`;
   sumElement.className = 'tracklist_track_duration';
   tr.appendChild(sumElement);
   footer.appendChild(tr);
