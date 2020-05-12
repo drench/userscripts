@@ -106,14 +106,18 @@ document.querySelectorAll('table.playlist').forEach(function (playlistTable) {
 
   if (isNaN(seconds) || seconds < 1) return;
 
-  var playlistColumns = playlistTable.querySelector('tr').querySelectorAll('td').length;
+  var playlistColumns = playlistTable.querySelector('tr.track').querySelectorAll('td').length;
 
   var footer = document.createElement('tfoot');
   var tr = document.createElement('tr');
   tr.className = 'tracklist_track track_heading';
 
   // Pad a column on pages with track numbers
-  if (playlistColumns == 3) tr.appendChild(document.createElement('td'));
+  var padCount = playlistColumns;
+  while (padCount > 2) {
+    tr.appendChild(document.createElement('td'));
+    padCount -= 1;
+  }
 
   var labelElement = document.createElement('td');
   labelElement.className = 'tracklist_track_title';
