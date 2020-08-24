@@ -20,6 +20,11 @@ const createButton = function () {
   return button;
 };
 
+const getInfoItems = function () {
+  var elements = Array.from(document.querySelectorAll('.mem-events *[itemprop]'));
+  return elements.filter(el => findagrave.hasOwnProperty(el.getAttribute('itemprop')));
+};
+
 const param = function (key) {
   return encodeURI(findagrave[key]);
 };
@@ -57,4 +62,13 @@ if (typeof findagrave !== 'undefined') {
     memorialElement.innerHTML = '';
     memorialElement.appendChild(familySearchLink);
   }
-}
+
+  getInfoItems().forEach(el => {
+    el.addEventListener('click', event => {
+      var val = findagrave[el.getAttribute('itemprop')];
+      navigator.clipboard.writeText(val);
+    });
+    el.setAttribute('title', 'click to copy');
+    el.style.cursor = 'pointer';
+  });
+};
