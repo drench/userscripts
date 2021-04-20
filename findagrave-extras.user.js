@@ -2,7 +2,7 @@
 // @name        FindAGrave Extras
 // @description Adds links to FindAGrave pages
 // @include     /^https://www.findagrave.com/memorial/[0-9]+//
-// @run-at      document-end
+// @run-at      document-idle
 // ==/UserScript==
 
 const isMemorialPage = function () {
