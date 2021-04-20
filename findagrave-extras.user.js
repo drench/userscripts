@@ -5,12 +5,113 @@
 // @run-at      document-idle
 // ==/UserScript==
 
-const isMemorialPage = function () {
-  return findagrave &&
-    findagrave.hasOwnProperty('memorialId') &&
-    (typeof(findagrave.memorialId) == 'string') &&
-    (findagrave.memorialId.trim() != '');
-};
+class FindAGraveMemorial {
+  constructor(fg, doc) {
+    this.findagrave = fg;
+    this.document = doc;
+  }
+
+  getPropertyPresence(property) {
+    if (!this.isValid()) return '';
+    if (!this.findagrave.hasOwnProperty(property)) return '';
+    if (typeof(this.findagrave[property]) != 'string') return '';
+    return this.findagrave[property].trim();
+  }
+
+  isValid() { return !!this.findagrave }
+
+  get birthPlace() {
+    let birthLocationLabel = this.document.getElementById('birthLocationLabel');
+    return birthLocationLabel && birthLocationLabel.innerText;
+  }
+
+  get birthYear() { return parseInt(this.findagrave.birthYear, 10) }
+
+  get deathPlace() {
+    let deathLocationLabel = this.document.getElementById('deathLocationLabel');
+    return deathLocationLabel && deathLocationLabel.innerText;
+  }
+
+  get deathYear() { return parseInt(this.findagrave.deathYear, 10) }
+
+  get firstName() { return this.getPropertyPresence('firstName') }
+  get lastName() { return this.getPropertyPresence('lastName') }
+
+  get memorialId() {
+    return parseInt(this.getPropertyPresence('memorialId'), 10);
+  }
+}
+
+class FamilySearchRecordQuery {
+  constructor(memorial) { this.memorial = memorial }
+  static rootUrl = "https://www.familysearch.org/search/record/results";
+
+  get birthLikePlace() { return encodeURI(this.memorial.birthPlace || '') }
+  get birthLikeDate() { return this.memorial.birthYear || '' }
+  get deathLikePlace() { return encodeURI(this.memorial.deathPlace || '') }
+  get deathLikeDate() { return this.memorial.deathYear || '' }
+  get givenName() { return encodeURI(this.memorial.firstName || '') }
+  get surname() { return encodeURI(this.memorial.lastName || '') }
+
+  get url() {
+    return `${FamilySearchRecordQuery.rootUrl}?` +
+      `q.givenName=${this.givenName}&` +
+      `q.surname=${this.surname}&` +
+      `q.birthLikePlace=${this.birthLikePlace}&` +
+      `q.birthLikeDate.from=${this.birthLikeDate}&` +
+      `q.birthLikeDate.to=${this.birthLikeDate}&` +
+      `q.deathLikePlace=${this.deathLikePlace}&` +
+      `q.deathLikeDate.from=${this.deathLikeDate}&` +
+      `q.deathLikeDate.to=${this.deathLikeDate}`;
+  }
+}
+
+class FamilySearchTreeQuery {
+  constructor(memorial) { this.memorial = memorial }
+  static rootUrl = "https://www.familysearch.org/tree/find/name";
+
+  get birth() {
+    let year = this.memorial.birthYear || "";
+
+    return([
+      encodeURI(this.memorial.birthPlace || ""), `${year}-${year}`, 0, 1
+    ].join(encodeURI("|")));
+  }
+
+  get death() {
+    let year = this.memorial.deathYear || "";
+
+    return([
+      encodeURI(this.memorial.deathPlace || ""), `${year}-${year}`, 0, 1
+    ].join(encodeURI("|")));
+  }
+
+  get self() {
+    return([
+      encodeURI(this.memorial.firstName),
+      encodeURI(this.memorial.lastName)
+    ].join(encodeURI("|")));
+  }
+
+  get url() {
+    return `${FamilySearchTreeQuery.rootUrl}?` +
+      `self=${this.self}&` +
+      "gender=&" +
+      `birth=${this.birth}&` +
+      `death=${this.death}`;
+  }
+}
+
+class FamilySearchFindAGraveQuery {
+  constructor(memorial) { this.memorial = memorial }
+  static rootUrl = "https://www.familysearch.org/search/record/results";
+
+  get url() {
+    return `${FamilySearchFindAGraveQuery.rootUrl}?` +
+      `external_record_id=${this.memorial.memorialId}&` +
+      "collection_id=2221801";
+  }
+}
 
 const createLink = function () {
   var link = document.createElement('a');
@@ -50,30 +151,22 @@ const deathPlace = function () {
   else return "";
 };
 
-if (isMemorialPage()) {
-  var buttonContainer = document.querySelector('.form-group.hidden-print');
+
+const memorial = new FindAGraveMemorial(findagrave, document);
+
+if (memorial.memorialId) {
+  let buttonContainer = document.querySelector('.form-group.hidden-print');
   if (buttonContainer) {
-    var treeSearchButton = createButton();
+    let treeSearchButton = createButton();
     treeSearchButton.innerText = 'Tree Search';
     treeSearchButton.title = 'Check FamilySearch trees';
-    treeSearchButton.href = 'https://www.familysearch.org/tree/find/name?' +
-      `search=1&birth=${birthPlace()}%7C${param('birthYear')}-${param('birthYear')}%7C0` +
-      `&death=${deathPlace()}%7C${param('deathYear')}-${param('deathYear')}%7C0` +
-      `&self=${param('firstName')}%7C${param('lastName')}%7C0%7C0`;
+    treeSearchButton.href = (new FamilySearchTreeQuery(memorial)).url;
     buttonContainer.appendChild(treeSearchButton);
 
-    var recordSearchButton = createButton();
+    let recordSearchButton = createButton();
     recordSearchButton.innerText = 'Record Search';
     recordSearchButton.title = 'Check FamilySearch records';
-    recordSearchButton.href = 'https://www.familysearch.org/search/record/' +
-      `results?q.givenName=${param('firstName')}` +
-      `&q.surname=${param('lastName')}` +
-      `&q.birthLikePlace=${birthPlace()}` +
-      `&q.birthLikeDate.from=${param('birthYear')}` +
-      `&q.birthLikeDate.to=${param('birthYear')}` +
-      `&q.deathLikePlace=${deathPlace()}` +
-      `&q.deathLikeDate.from=${param('deathYear')}` +
-      `&q.deathLikeDate.to=${param('deathYear')}`;
+    recordSearchButton.href = (new FamilySearchRecordQuery(memorial)).url;
     buttonContainer.appendChild(recordSearchButton);
   }
 
@@ -82,9 +175,7 @@ if (isMemorialPage()) {
     var familySearchLink = createLink();
     familySearchLink.innerText = findagrave.memorialId;
     familySearchLink.title = 'Look up this grave on FamilySearch';
-    familySearchLink.href =
-      'https://www.familysearch.org/search/record/results' +
-      `?external_record_id=${findagrave.memorialId}&collection_id=2221801`;
+    familySearchLink.href = (new FamilySearchFindAGraveQuery(memorial)).url;
     memorialElement.innerHTML = '';
     memorialElement.appendChild(familySearchLink);
   }
