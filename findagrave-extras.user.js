@@ -6,7 +6,7 @@
 // ==/UserScript==
 
 const isMemorialPage = function () {
-  return findagrave &&
+  return window.findagrave &&
     findagrave.hasOwnProperty('memorialId') &&
     (typeof(findagrave.memorialId) == 'string') &&
     (findagrave.memorialId.trim() != '');
