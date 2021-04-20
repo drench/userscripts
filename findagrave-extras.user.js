@@ -36,6 +36,20 @@ const param = function (key) {
   return encodeURI(findagrave[key]);
 };
 
+const birthPlace = function () {
+  let birthLocationLabel = document.getElementById('birthLocationLabel');
+  if (birthLocationLabel && birthLocationLabel.innerText)
+    return encodeURI(birthLocationLabel.innerText);
+  else return "";
+};
+
+const deathPlace = function () {
+  let deathLocationLabel = document.getElementById('deathLocationLabel');
+  if (deathLocationLabel && deathLocationLabel.innerText)
+    return encodeURI(deathLocationLabel.innerText);
+  else return "";
+};
+
 if (isMemorialPage()) {
   var buttonContainer = document.querySelector('.form-group.hidden-print');
   if (buttonContainer) {
@@ -43,8 +57,8 @@ if (isMemorialPage()) {
     treeSearchButton.innerText = 'Tree Search';
     treeSearchButton.title = 'Check FamilySearch trees';
     treeSearchButton.href = 'https://www.familysearch.org/tree/find/name?' +
-      `search=1&birth=%7C${param('birthYear')}-${param('birthYear')}%7C0` +
-      `&death=%7C${param('deathYear')}-${param('deathYear')}%7C0` +
+      `search=1&birth=${birthPlace()}%7C${param('birthYear')}-${param('birthYear')}%7C0` +
+      `&death=${deathPlace()}%7C${param('deathYear')}-${param('deathYear')}%7C0` +
       `&self=${param('firstName')}%7C${param('lastName')}%7C0%7C0`;
     buttonContainer.appendChild(treeSearchButton);
 
@@ -52,9 +66,14 @@ if (isMemorialPage()) {
     recordSearchButton.innerText = 'Record Search';
     recordSearchButton.title = 'Check FamilySearch records';
     recordSearchButton.href = 'https://www.familysearch.org/search/record/' +
-      `results?givenname=${param('firstName')}&surname=${param('lastName')}` +
-      `&birth_year_from=${param('birthYear')}&birth_year_to=${param('birthYear')}` +
-      `&death_year_from=${param('deathYear')}&death_year_to=${param('deathYear')}`;
+      `results?q.givenName=${param('firstName')}` +
+      `&q.surname=${param('lastName')}` +
+      `&q.birthLikePlace=${birthPlace()}` +
+      `&q.birthLikeDate.from=${param('birthYear')}` +
+      `&q.birthLikeDate.to=${param('birthYear')}` +
+      `&q.deathLikePlace=${deathPlace()}` +
+      `&q.deathLikeDate.from=${param('deathYear')}` +
+      `&q.deathLikeDate.to=${param('deathYear')}`;
     buttonContainer.appendChild(recordSearchButton);
   }
 
