@@ -11,6 +11,21 @@ class FindAGraveMemorial {
     this.document = doc;
   }
 
+  createLink() {
+    let link = this.document.createElement('a');
+    link.target = '_blank';
+    link.className = 'add-link';
+    return link;
+  }
+
+  createButton() {
+    let button = this.document.createElement('a');
+    button.target = '_blank';
+    button.className = 'btn btn-dark btn-dark btn-sm';
+    button.style.marginInline = '3px';
+    return button;
+  }
+
   getPropertyPresence(property) {
     if (!this.isValid()) return '';
     if (!this.findagrave.hasOwnProperty(property)) return '';
@@ -113,57 +128,29 @@ class FamilySearchFindAGraveQuery {
   }
 }
 
-const createLink = function () {
-  var link = document.createElement('a');
-  link.target = '_blank';
-  link.className = 'add-link';
-  return link;
-};
-
-const createButton = function () {
-  var button = document.createElement('a');
-  button.target = '_blank';
-  button.className = 'btn btn-dark btn-dark btn-sm';
-  button.style.marginInline = '3px';
-  return button;
-};
-
 const getInfoItems = function () {
   var elements = Array.from(document.querySelectorAll('.mem-events *[itemprop]'));
   return elements.filter(el => findagrave.hasOwnProperty(el.getAttribute('itemprop')));
 };
 
-const param = function (key) {
-  return encodeURI(findagrave[key]);
+const originalName = function () {
+  let th = document.evaluate('//th[text()="Original Name"]').iterateNext();
+  if (th && th.nextElementSibling) return th.nextElementSibling.innerText;
+  else return `${findagrave.firstName} ${findagrave.lastName}`;
 };
-
-const birthPlace = function () {
-  let birthLocationLabel = document.getElementById('birthLocationLabel');
-  if (birthLocationLabel && birthLocationLabel.innerText)
-    return encodeURI(birthLocationLabel.innerText);
-  else return "";
-};
-
-const deathPlace = function () {
-  let deathLocationLabel = document.getElementById('deathLocationLabel');
-  if (deathLocationLabel && deathLocationLabel.innerText)
-    return encodeURI(deathLocationLabel.innerText);
-  else return "";
-};
-
 
 const memorial = new FindAGraveMemorial(findagrave, document);
 
 if (memorial.memorialId) {
   let buttonContainer = document.querySelector('.form-group.hidden-print');
   if (buttonContainer) {
-    let treeSearchButton = createButton();
+    let treeSearchButton = memorial.createButton();
     treeSearchButton.innerText = 'Tree Search';
     treeSearchButton.title = 'Check FamilySearch trees';
     treeSearchButton.href = (new FamilySearchTreeQuery(memorial)).url;
     buttonContainer.appendChild(treeSearchButton);
 
-    let recordSearchButton = createButton();
+    let recordSearchButton = memorial.createButton();
     recordSearchButton.innerText = 'Record Search';
     recordSearchButton.title = 'Check FamilySearch records';
     recordSearchButton.href = (new FamilySearchRecordQuery(memorial)).url;
@@ -172,7 +159,7 @@ if (memorial.memorialId) {
 
   var memorialElement = document.getElementById('memNumberLabel');
   if (memorialElement) {
-    var familySearchLink = createLink();
+    var familySearchLink = memorial.createLink();
     familySearchLink.innerText = findagrave.memorialId;
     familySearchLink.title = 'Look up this grave on FamilySearch';
     familySearchLink.href = (new FamilySearchFindAGraveQuery(memorial)).url;
