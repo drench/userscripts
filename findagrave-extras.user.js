@@ -1,9 +1,16 @@
 // ==UserScript==
 // @name        FindAGrave Extras
 // @description Adds links to FindAGrave pages
-// @include     https://www.findagrave.com/memorial/*
+// @include     /^https://www.findagrave.com/memorial/[0-9]+//
 // @run-at      document-end
 // ==/UserScript==
+
+const isMemorialPage = function () {
+  return findagrave &&
+    findagrave.hasOwnProperty('memorialId') &&
+    (typeof(findagrave.memorialId) == 'string') &&
+    (findagrave.memorialId.trim() != '');
+};
 
 const createLink = function () {
   var link = document.createElement('a');
@@ -29,7 +36,7 @@ const param = function (key) {
   return encodeURI(findagrave[key]);
 };
 
-if (typeof findagrave !== 'undefined') {
+if (isMemorialPage()) {
   var buttonContainer = document.querySelector('.form-group.hidden-print');
   if (buttonContainer) {
     var treeSearchButton = createButton();
