@@ -6,10 +6,10 @@
 // ==/UserScript==
 
 const isMemorialPage = function () {
-  return window.findagrave &&
-    window.findagrave.hasOwnProperty('memorialId') &&
-    (typeof(window.findagrave.memorialId) == 'string') &&
-    (window.findagrave.memorialId.trim() != '');
+  return findagrave &&
+    findagrave.hasOwnProperty('memorialId') &&
+    (typeof(findagrave.memorialId) == 'string') &&
+    (findagrave.memorialId.trim() != '');
 };
 
 const createLink = function () {
