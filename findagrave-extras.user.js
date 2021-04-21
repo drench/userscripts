@@ -7,7 +7,7 @@
 
 class FindAGraveMemorial {
   constructor(fg, doc) {
-    this.findagrave = fg;
+    try { this.findagrave = fg() } catch(e) { }
     this.document = doc;
   }
 
@@ -139,7 +139,7 @@ const originalName = function () {
   else return `${findagrave.firstName} ${findagrave.lastName}`;
 };
 
-const memorial = new FindAGraveMemorial(findagrave, document);
+const memorial = new FindAGraveMemorial(function () { return findagrave }, document);
 
 if (memorial.memorialId) {
   let buttonContainer = document.querySelector('.form-group.hidden-print');
