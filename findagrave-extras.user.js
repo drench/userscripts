@@ -13,20 +13,22 @@ class FindAGraveMemorial {
 
   createLink(opt) {
     opt ||= {};
-    opt.target ||= '_blank';
-    opt.className ||= 'add-link';
-
-    return Object.assign(this.document.createElement('a'), opt);
+    let attr = Object.assign({ className: 'add-link', target: '_blank' }, opt);
+    return Object.assign(this.document.createElement('a'), attr);
   }
 
   createButton(opt) {
     opt ||= {};
-    opt.target ||= '_blank';
-    opt.className ||= 'btn btn-dark btn-dark btn-sm text-uppercase';
-    opt.style ||= {};
-    opt.style.marginInline ||= '3px';
 
-    return Object.assign(this.document.createElement('a'), opt);
+    let attr = Object.assign({
+      className: 'btn btn-dark btn-dark btn-sm text-uppercase',
+      style: {},
+      target: '_blank',
+      type: 'button'
+    }, opt);
+    attr.style.marginInline ||= '3px';
+
+    return Object.assign(this.document.createElement('a'), attr);
   }
 
   getPropertyPresence(property) {
