@@ -22,7 +22,7 @@ class FindAGraveMemorial {
   createButton(opt) {
     opt ||= {};
     opt.target ||= '_blank';
-    opt.className ||= 'btn btn-dark btn-dark btn-sm';
+    opt.className ||= 'btn btn-dark btn-dark btn-sm text-uppercase';
     opt.style ||= {};
     opt.style.marginInline ||= '3px';
 
@@ -47,7 +47,7 @@ class FindAGraveMemorial {
 
   get buttonContainer() {
     return this._buttonContainer ||=
-      this.document.querySelector('.form-group.hidden-print');
+      this.document.querySelector('.form-group.d-print-none');
   }
 
   get deathPlace() {
