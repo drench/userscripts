@@ -11,19 +11,22 @@ class FindAGraveMemorial {
     this.document = doc;
   }
 
-  createLink() {
-    let link = this.document.createElement('a');
-    link.target = '_blank';
-    link.className = 'add-link';
-    return link;
+  createLink(opt) {
+    opt ||= {};
+    opt.target ||= '_blank';
+    opt.className ||= 'add-link';
+
+    return Object.assign(this.document.createElement('a'), opt);
   }
 
-  createButton() {
-    let button = this.document.createElement('a');
-    button.target = '_blank';
-    button.className = 'btn btn-dark btn-dark btn-sm';
-    button.style.marginInline = '3px';
-    return button;
+  createButton(opt) {
+    opt ||= {};
+    opt.target ||= '_blank';
+    opt.className ||= 'btn btn-dark btn-dark btn-sm';
+    opt.style ||= {};
+    opt.style.marginInline ||= '3px';
+
+    return Object.assign(this.document.createElement('a'), opt);
   }
 
   getPropertyPresence(property) {
@@ -42,6 +45,11 @@ class FindAGraveMemorial {
 
   get birthYear() { return parseInt(this.findagrave.birthYear, 10) }
 
+  get buttonContainer() {
+    return this._buttonContainer ||=
+      this.document.querySelector('.form-group.hidden-print');
+  }
+
   get deathPlace() {
     let deathLocationLabel = this.document.getElementById('deathLocationLabel');
     return deathLocationLabel && deathLocationLabel.innerText;
@@ -49,8 +57,24 @@ class FindAGraveMemorial {
 
   get deathYear() { return parseInt(this.findagrave.deathYear, 10) }
 
+  get familySearchFindAGraveQuery() {
+    return this._familySearchFindAGraveQuery ||= new FamilySearchFindAGraveQuery(this);
+  }
+
+  get familySearchRecordQuery() {
+    return this._familySearchRecordQuery ||= new FamilySearchRecordQuery(this);
+  }
+
+  get familySearchTreeQuery() {
+    return this._familySearchTreeQuery ||= new FamilySearchTreeQuery(this);
+  }
+
   get firstName() { return this.getPropertyPresence('firstName') }
   get lastName() { return this.getPropertyPresence('lastName') }
+
+  get memorialElement() {
+    return this._memorialElement ||= document.getElementById('memNumberLabel');
+  }
 
   get memorialId() {
     return parseInt(this.getPropertyPresence('memorialId'), 10);
@@ -142,29 +166,30 @@ const originalName = function () {
 const memorial = new FindAGraveMemorial(function () { return findagrave }, document);
 
 if (memorial.memorialId) {
-  let buttonContainer = document.querySelector('.form-group.hidden-print');
-  if (buttonContainer) {
-    let treeSearchButton = memorial.createButton();
-    treeSearchButton.innerText = 'Tree Search';
-    treeSearchButton.title = 'Check FamilySearch trees';
-    treeSearchButton.href = (new FamilySearchTreeQuery(memorial)).url;
-    buttonContainer.appendChild(treeSearchButton);
+  if (memorial.buttonContainer) {
+    let treeSearchButton = memorial.createButton({
+      href: memorial.familySearchTreeQuery.url,
+      innerText: 'Tree Search',
+      title: 'Check FamilySearch trees'
+    });
+    memorial.buttonContainer.appendChild(treeSearchButton);
 
-    let recordSearchButton = memorial.createButton();
-    recordSearchButton.innerText = 'Record Search';
-    recordSearchButton.title = 'Check FamilySearch records';
-    recordSearchButton.href = (new FamilySearchRecordQuery(memorial)).url;
-    buttonContainer.appendChild(recordSearchButton);
+    let recordSearchButton = memorial.createButton({
+      href: memorial.familySearchRecordQuery.url,
+      innerText: 'Record Search',
+      title: 'Check FamilySearch records'
+    });
+    memorial.buttonContainer.appendChild(recordSearchButton);
   }
 
-  var memorialElement = document.getElementById('memNumberLabel');
-  if (memorialElement) {
-    var familySearchLink = memorial.createLink();
-    familySearchLink.innerText = findagrave.memorialId;
-    familySearchLink.title = 'Look up this grave on FamilySearch';
-    familySearchLink.href = (new FamilySearchFindAGraveQuery(memorial)).url;
-    memorialElement.innerHTML = '';
-    memorialElement.appendChild(familySearchLink);
+  if (memorial.memorialElement) {
+    let familySearchLink = memorial.createLink({
+      href: memorial.familySearchFindAGraveQuery.url,
+      innerText: findagrave.memorialId,
+      title: 'Look up this grave on FamilySearch'
+    });
+    memorial.memorialElement.innerHTML = '';
+    memorial.memorialElement.appendChild(familySearchLink);
   }
 
   getInfoItems().forEach(el => {
