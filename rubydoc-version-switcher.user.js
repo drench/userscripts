@@ -113,7 +113,7 @@ document.body.appendChild(rubydoc.versions);
 
 var input = document.createElement('input');
 input.setAttribute('list', rubydoc.versions.id);
-input.setAttribute('autocomplete', 'off');
+input.setAttribute('autocomplete', 'on');
 input.setAttribute('placeholder', 'Ruby version…');
 input.style.height = '1.3em';
 
