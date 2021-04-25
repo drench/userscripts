@@ -40,68 +40,21 @@ class RubyDoc {
   }
 }
 
-RubyDoc.versions = [
-  '2.6.5',
-  '2.6.4',
-  '2.6.3',
-  '2.6.2',
-  '2.6.1',
-  '2.6',
-  '2.5.7',
-  '2.5.6',
-  '2.5.5',
-  '2.5.4',
-  '2.5.3',
-  '2.5.2',
-  '2.5.1',
-  '2.5.0',
-  '2.4.9',
-  '2.4.8',
-  '2.4.7',
-  '2.4.6',
-  '2.4.5',
-  '2.4.4',
-  '2.4.3',
-  '2.4.2',
-  '2.4.1',
-  '2.4.0',
-  '2.3.8',
-  '2.3.7',
-  '2.3.6',
-  '2.3.5',
-  '2.3.4',
-  '2.3.3',
-  '2.3.2',
-  '2.3.1',
-  '2.3.0',
-  '2.2.10',
-  '2.2.9',
-  '2.2.8',
-  '2.2.7',
-  '2.2.6',
-  '2.2.5',
-  '2.2.4',
-  '2.2.3',
-  '2.2.2',
-  '2.2.1',
-  '2.2.0',
-  '2.1.10',
-  '2.1.9',
-  '2.1.8',
-  '2.1.7',
-  '2.1.6',
-  '2.1.5',
-  '2.1.4',
-  '2.1.3',
-  '2.1.2',
-  '2.1.1',
-  '2.1.0',
-  '2.0.0',
-  '1.9.2',
-  '1.9.1',
-  '1.8.7',
-  '1.8.6'
-];
+RubyDoc.getVersions = async function() {
+  let current = sessionStorage.getItem('versions');
+  if (current) return JSON.parse(current);
+  let html = await (await fetch('/downloads/')).text();
+  let parser = new DOMParser();
+  let doc = parser.parseFromString(html, 'text/html');
+  current = Array.from(doc.querySelectorAll('h3'))
+    .map((e) => e.innerText)
+    .filter((t) => t.match(/^The .+ Base Distribution RDoc HTML$/))
+    .map((t) => t.replace(/^The (.+) Base.+$/, '$1'));
+  sessionStorage.setItem('versions', JSON.stringify(current));
+  return current;
+};
+
+RubyDoc.versions = await RubyDoc.getVersions();
 
 var rubydoc = new RubyDoc(document);
 
