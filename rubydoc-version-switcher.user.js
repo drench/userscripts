@@ -13,6 +13,19 @@ class RubyDoc {
     this.version = pathmatch[2];
   }
 
+  get inputWidget() {
+    if (!this._inputWidget) {
+      let attr = {
+        autocomplete: "on",
+        list: this.versions.id,
+        placeholder: "Ruby version…"
+      };
+      this._inputWidget = Object.assign(this.doc.createElement("input"), attr);
+      this._inputWidget.style.height = '1.3em';
+    }
+    return this._inputWidget;
+  }
+
   get pathname() { return this.doc.location.pathname }
   get page() { return this.pathname.replace(/^\/[^\/]+/, '') }
 
@@ -64,11 +77,7 @@ if (!rd_action_search)
 
 document.body.appendChild(rubydoc.versions);
 
-var input = document.createElement('input');
-input.setAttribute('list', rubydoc.versions.id);
-input.setAttribute('autocomplete', 'on');
-input.setAttribute('placeholder', 'Ruby version…');
-input.style.height = '1.3em';
+var input = rubydoc.inputWidget;
 
 input.addEventListener('change', function (event) {
   var number = event.target.value.replace(/\s+/g, '');
