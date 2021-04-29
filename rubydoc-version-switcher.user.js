@@ -164,26 +164,45 @@ class UpdateUrlOnScroll {
 }
 RubyDocExtras.onSetup(UpdateUrlOnScroll);
 
+// Link the "In Files" filenames to their source on Github
+class LinkToRubySource {
+  constructor(win) { this.window = win }
+
+  get baseUrl() {
+    return this._baseUrl ||= `https://github.com/ruby/ruby/tree/${this.versionTag}`;
+  }
+
+  get document() { return this.window.document }
+
+  get versionTag() {
+    let pathmatch = this.document.location.pathname.match(/^\/[a-z]+-([1-9]\.[0-9\.]+)/);
+    let version = pathmatch[1];
+    return `v${version.replace(/\./g, '_')}`;
+  }
+
+  get sourceElements() {
+    return this.document.querySelectorAll('#file-metadata .in-file');
+  }
+
+  url(filename) {
+    if (filename.endsWith('.c')) return `${this.baseUrl}/${filename}`;
+    if (filename.endsWith('.rb')) return `${this.baseUrl}/lib/${filename}`;
+  }
+
+  createLinkInElement(element) {
+    let href = this.url(element.innerText);
+    if (!href) return;
+
+    let a = this.document.createElement('a');
+    a.href = href;
+    a.target = '_blank';
+    a.innerText = element.innerText;
+    element.innerText = '';
+    element.appendChild(a);
+  }
+
+  setup() { this.sourceElements.forEach(li => { this.createLinkInElement(li) }) }
+}
+RubyDocExtras.onSetup(LinkToRubySource);
+
 RubyDocExtras.setup(window);
-
-// document.querySelectorAll('#file-metadata .in-file').forEach(function (li) {
-//   var tag = `v${rubydoc.version.replace(/\./g, '_')}`;
-//   var baseUrl = `https://github.com/ruby/ruby/tree/${tag}`;
-//   var url;
-
-//   if (li.innerText.match(/\.rb$/)) {
-//     url = `${baseUrl}/lib/${li.innerText}`;
-//   }
-//   else if (li.innerText.match(/\.c$/)) {
-//     url = `${baseUrl}/${li.innerText}`;
-//   }
-//   else
-//     return;
-
-//   var a = document.createElement('a');
-//   a.href = url;
-//   a.target = '_blank';
-//   a.innerText = li.innerText;
-//   li.innerText = '';
-//   li.appendChild(a);
-// });
