@@ -1,6 +1,6 @@
 // ==UserScript==
-// @name          Ruby Doc version switcher widget
-// @description	  Adds a version-switcher widget to ruby-doc.org
+// @name          Ruby Doc Extras
+// @description   Adds a version-switcher widget and other extras to ruby-doc.org
 // @include       https://ruby-doc.org/core-*
 // @include       https://ruby-doc.org/stdlib-*
 // ==/UserScript==
@@ -39,22 +39,6 @@
 //     return this.versionsDatalist;
 //   }
 // }
-
-// RubyDoc.getVersions = async function() {
-//   let current = sessionStorage.getItem('versions');
-//   if (current) return JSON.parse(current);
-//   let html = await (await fetch('/downloads/')).text();
-//   let parser = new DOMParser();
-//   let doc = parser.parseFromString(html, 'text/html');
-//   current = Array.from(doc.querySelectorAll('h3'))
-//     .map((e) => e.innerText)
-//     .filter((t) => t.match(/^The .+ Base Distribution RDoc HTML$/))
-//     .map((t) => t.replace(/^The (.+) Base.+$/, '$1'));
-//   sessionStorage.setItem('versions', JSON.stringify(current));
-//   return current;
-// };
-
-// RubyDoc.versions = await RubyDoc.getVersions();
 
 // var rubydoc = new RubyDoc(document);
 
@@ -204,5 +188,23 @@ class LinkToRubySource {
   setup() { this.sourceElements.forEach(li => { this.createLinkInElement(li) }) }
 }
 RubyDocExtras.onSetup(LinkToRubySource);
+
+const RubyVersions = {};
+RubyVersions.fetchVersions = async function(win) {
+  let storage = win.sessionStorage;
+  let current = storage.getItem('ruby-versions');
+  if (current) return JSON.parse(current);
+  let html = await (await win.fetch('/downloads/')).text();
+  let parser = new DOMParser();
+  let doc = parser.parseFromString(html, 'text/html');
+  current = Array.from(doc.querySelectorAll('h3'))
+    .map((e) => e.innerText)
+    .filter((t) => t.match(/^The .+ Base Distribution RDoc HTML$/))
+    .map((t) => t.replace(/^The (.+) Base.+$/, '$1'));
+
+  storage.setItem('ruby-versions', JSON.stringify(current));
+  return current;
+}
+RubyVersions.all = await RubyVersions.fetchVersions(window);
 
 RubyDocExtras.setup(window);
