@@ -88,21 +88,23 @@ class RubyDocExtras {
   static onSetup(klass) { RubyDocExtras.setupClasses.push(klass) }
   static setup(doc) { (new RubyDocExtras(doc)).setup() }
 
-  constructor(doc) { this.document = doc }
+  constructor(win) { this.window = win }
 
   setup() {
-    RubyDocExtras.setupClasses.forEach(cb => { (new cb(this.document)).setup() });
+    RubyDocExtras.setupClasses.forEach(cb => {
+      (new cb(this.window)).setup()
+    });
   }
 }
 
 // Make the "action bar" stick to the top of the page
 class AnchorActionBar {
-  constructor(doc) {
-    this.document = doc;
-    this.style = { position: 'fixed', top: '0px', zIndex: '9999' };
+  constructor(win) {
+    this.window = win;
+    this.style = { position: "fixed", top: "0px", zIndex: "9999" };
   }
 
-  get actionbar() { return this.document.getElementById('actionbar') }
+  get actionbar() { return this.window.document.getElementById("actionbar") }
 
   setup() {
     if (this.actionbar)
@@ -111,40 +113,58 @@ class AnchorActionBar {
       console.warn("Cannot locate the #actionbar element", this);
   }
 }
-
 RubyDocExtras.onSetup(AnchorActionBar);
 
-RubyDocExtras.setup(document);
+// Update the URL with the current anchor when scrolling
+class UpdateUrlOnScroll {
+  constructor(win) {
+    this.window = win;
+    this.currentAnchor = undefined;
+  }
 
-// var anchorElements = Array.from(document.querySelectorAll('a[name^=method-]'));
-// var currentAnchor = undefined;
-// var topAnchors = function() {
-//   return anchorElements.
-//       map(e => ({ "el": e, "top": e.getBoundingClientRect().top })).
-//       sort(function (a, b) {
-//         if (a.top > b.top)
-//           return 1;
-//         if (a.top < b.top)
-//           return -1;
-//         return 0;
-//       }).
-//       filter(o => o.top > 0 && o.top < 200).
-//       map(a => a.el);
-// };
+  get anchorElements() {
+    return Array.from(this.window.document.querySelectorAll("a[name^=method-]"));
+  }
 
-// var updateHeading = function() {
-//   var topAnchor = topAnchors()[0];
-//   if (topAnchor && currentAnchor != topAnchor) {
-//     currentAnchor = topAnchor;
-//     history.pushState(null, null, `#${currentAnchor.name}`);
-//   }
-//   else if (currentAnchor && window.scrollY == 0) {
-//     currentAnchor = undefined;
-//     history.pushState(null, null, window.location.pathname + window.location.search);
-//   }
-// };
+  get topAnchors() {
+    return(this
+      .anchorElements
+      .map(e => ({ "el": e, "top": e.getBoundingClientRect().top }))
+      .sort(function (a, b) {
+        if (a.top > b.top) return 1;
+        if (a.top < b.top) return -1;
+        return 0;
+      })
+      .filter(o => o.top > 0 && o.top < 200)
+      .map(a => a.el)
+    );
+  }
 
-// window.addEventListener('scroll', updateHeading);
+  get topAnchor() { return this.topAnchors[0] }
+
+  setup() {
+    let self = this;
+    let updateHeading = function() {
+      if (self.topAnchor && self.currentAnchor != self.topAnchor) {
+        self.currentAnchor = self.topAnchor;
+        self.window.history.pushState(null, null, `#${self.currentAnchor.name}`);
+      }
+      else if (self.currentAnchor && self.window.scrollY == 0) {
+        self.currentAnchor = undefined;
+        self.window.history.pushState(
+          null,
+          null,
+          self.window.location.pathname + self.window.location.search
+        );
+      }
+    };
+
+    this.window.addEventListener('scroll', updateHeading);
+  }
+}
+RubyDocExtras.onSetup(UpdateUrlOnScroll);
+
+RubyDocExtras.setup(window);
 
 // document.querySelectorAll('#file-metadata .in-file').forEach(function (li) {
 //   var tag = `v${rubydoc.version.replace(/\./g, '_')}`;
