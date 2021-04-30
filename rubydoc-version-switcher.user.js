@@ -189,8 +189,30 @@ class LinkToRubySource {
 }
 RubyDocExtras.onSetup(LinkToRubySource);
 
-const RubyVersions = {};
-RubyVersions.fetchVersions = async function(win) {
+class RubyVersionSelector {
+  constructor(win) { this.window = win }
+
+  get versionsDataList() {
+    if (!this._versionsDataList) {
+      let doc = this.window.document;
+      let dl = doc.createElement('datalist');
+      dl.setAttribute('id', 'ruby_versions');
+      RubyVersionSelector.versions.forEach(function(version) {
+        let opt = doc.createElement('option');
+        opt.innerText = version;
+        dl.appendChild(opt);
+      });
+      this._versionsDataList = dl;
+    }
+    return this._versionsDataList;
+  }
+
+  setup() {
+    this.window.document.body.appendChild(this.versionsDataList);
+  }
+}
+
+RubyVersionSelector.fetchVersions = async function(win) {
   let storage = win.sessionStorage;
   let current = storage.getItem('ruby-versions');
   if (current) return JSON.parse(current);
@@ -205,6 +227,8 @@ RubyVersions.fetchVersions = async function(win) {
   storage.setItem('ruby-versions', JSON.stringify(current));
   return current;
 }
-RubyVersions.all = await RubyVersions.fetchVersions(window);
+RubyVersionSelector.versions = await RubyVersionSelector.fetchVersions(window);
+
+RubyDocExtras.onSetup(RubyVersionSelector);
 
 RubyDocExtras.setup(window);
