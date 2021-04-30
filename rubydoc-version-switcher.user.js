@@ -210,6 +210,7 @@ class RubyVersionSelector {
       input.setAttribute('autocomplete', 'on');
       input.setAttribute('placeholder', 'Ruby version…');
       input.style.height = '1.3em';
+      this._versionSelector = input;
     }
     return this._versionSelector;
   }
