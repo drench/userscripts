@@ -192,10 +192,12 @@ RubyDocExtras.onSetup(LinkToRubySource);
 class RubyVersionSelector {
   constructor(win) {
     this.document = win.document;
-    let pathmatch = this.pathname.match(/^\/(stdlib|core)-([1-9]\.[0-9\.]+)/);
+    let pathmatch = this.location.pathname.match(/^\/(stdlib|core)-([1-9]\.[0-9\.]+)/);
     this.category = pathmatch[1];
     this.version = pathmatch[2];
   }
+
+  get location() { return this.document.location }
 
   get searchBox() {
     return this.document.getElementById('rd-action-search');
@@ -239,7 +241,7 @@ class RubyVersionSelector {
     this.versionSelector.addEventListener('input', function (event) {
       let number = event.target.value.replace(/\s+/g, '');
       let newpath = self.pageForVersion(number);
-      if (newpath) self.document.location.pathname = newpath;
+      if (newpath) self.location.pathname = newpath;
     });
 
     let widget = this.document.createElement('li');
