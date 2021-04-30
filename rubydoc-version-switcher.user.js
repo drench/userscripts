@@ -5,68 +5,6 @@
 // @include       https://ruby-doc.org/stdlib-*
 // ==/UserScript==
 
-// class RubyDoc {
-//   constructor(doc) {
-//     this.doc = doc;
-//     var pathmatch = this.pathname.match(/^\/(stdlib|core)-([1-9]\.[0-9\.]+)/);
-//     this.category = pathmatch[1];
-//     this.version = pathmatch[2];
-//   }
-
-//   get pathname() { return this.doc.location.pathname }
-//   get page() { return this.pathname.replace(/^\/[^\/]+/, '') }
-
-//   pageForVersion(number) {
-//     if (RubyDoc.versions.includes(number))
-//       return `/${this.category}-${number}${this.page}`;
-//     else
-//       return console.log(`${number} is not a Ruby version we know about`);
-//   }
-
-//   get versions () {
-//     if (this.versionsDatalist) return this.versionsDatalist;
-
-//     var doc = this.doc;
-//     var dl = doc.createElement('datalist');
-//     dl.setAttribute('id', 'ruby_versions');
-//     RubyDoc.versions.forEach(function (version) {
-//       var opt = doc.createElement('option');
-//       opt.innerText = version;
-//       dl.appendChild(opt);
-//     });
-
-//     this.versionsDatalist = dl;
-//     return this.versionsDatalist;
-//   }
-// }
-
-// var rubydoc = new RubyDoc(document);
-
-// var rd_action_search = document.querySelector('#rd-action-search');
-// if (!rd_action_search)
-//   return console.log('Cannot find the #rd-action-search element!');
-
-// document.body.appendChild(rubydoc.versions);
-
-// var input = document.createElement('input');
-// input.setAttribute('list', rubydoc.versions.id);
-// input.setAttribute('autocomplete', 'on');
-// input.setAttribute('placeholder', 'Ruby version…');
-// input.style.height = '1.3em';
-
-// input.addEventListener('input', function (event) {
-//   var number = event.target.value.replace(/\s+/g, '');
-//   var newpath = rubydoc.pageForVersion(number);
-//   if (newpath)
-//     document.location.pathname = newpath;
-// });
-
-// var widget = document.createElement('li');
-// widget.className = 'grid-2 right';
-// widget.appendChild(input);
-
-// rd_action_search.parentNode.insertBefore(widget, rd_action_search);
-
 class RubyDocExtras {
   static setupClasses = [];
   static onSetup(klass) { RubyDocExtras.setupClasses.push(klass) }
