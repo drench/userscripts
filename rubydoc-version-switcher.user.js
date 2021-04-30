@@ -218,8 +218,9 @@ class RubyVersionSelector {
     if (!this._versionsDataList) {
       let dl = this.document.createElement('datalist');
       dl.setAttribute('id', 'ruby_versions');
+      let doc = this.document;
       RubyVersionSelector.versions.forEach(function(version) {
-        let opt = this.document.createElement('option');
+        let opt = doc.createElement('option');
         opt.innerText = version;
         dl.appendChild(opt);
       });
