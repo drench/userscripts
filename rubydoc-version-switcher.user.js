@@ -88,18 +88,9 @@ RubyDocExtras.onSetup(UpdateUrlOnScroll);
 
 // Link the "In Files" filenames to their source on Github
 class LinkToRubySource {
-  constructor(win) { this.window = win }
-
-  get baseUrl() {
-    return this._baseUrl ||= `https://github.com/ruby/ruby/tree/${this.versionTag}`;
-  }
-
-  get document() { return this.window.document }
-
-  get versionTag() {
-    let pathmatch = this.document.location.pathname.match(/^\/[a-z]+-([1-9]\.[0-9\.]+)/);
-    let version = pathmatch[1];
-    return `v${version.replace(/\./g, '_')}`;
+  constructor(win) {
+    this.document = win.document;
+    this.baseUrl = 'https://github.com/search?type=Code&ref=advsearch&q=';
   }
 
   get sourceElements() {
@@ -107,12 +98,11 @@ class LinkToRubySource {
   }
 
   url(filename) {
-    if (filename.endsWith('.c') || filename.endsWith('.y'))
-      if (filename.indexOf('/') == -1)
-        return `${this.baseUrl}/${filename}`;
-      else
-        return `${this.baseUrl}/ext/${filename}`;
-    if (filename.endsWith('.rb')) return `${this.baseUrl}/lib/${filename}`;
+    let query = ["repo:ruby/ruby"];
+    let components = filename.split('/');
+    query.push(`filename:${components.pop()}`);
+    if (components.length) query.push(`path:${components.join('/')}`);
+    return this.baseUrl + encodeURIComponent(query.join(' '));
   }
 
   createLinkInElement(element) {
