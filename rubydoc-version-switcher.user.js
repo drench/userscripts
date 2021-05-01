@@ -108,7 +108,10 @@ class LinkToRubySource {
 
   url(filename) {
     if (filename.endsWith('.c') || filename.endsWith('.y'))
-      return `${this.baseUrl}/${filename}`;
+      if (filename.indexOf('/') == -1)
+        return `${this.baseUrl}/${filename}`;
+      else
+        return `${this.baseUrl}/ext/${filename}`;
     if (filename.endsWith('.rb')) return `${this.baseUrl}/lib/${filename}`;
   }
 
