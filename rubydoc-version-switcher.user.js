@@ -131,12 +131,12 @@ RubyDocExtras.onSetup(LinkToRubySource);
 class RubyVersionSelector {
   constructor(win) {
     this.document = win.document;
-    let pathmatch = this.location.pathname.match(/^\/(stdlib|core)-([1-9]\.[0-9\.]+)/);
+    let pathmatch = this.location.pathname.match(/^\/(stdlib|core)-/);
     this.category = pathmatch[1];
-    this.version = pathmatch[2];
   }
 
   get location() { return this.document.location }
+  get page() { return this.location.pathname.replace(/^\/[^\/]+/, '') }
 
   get searchBox() {
     return this.document.getElementById('rd-action-search');
@@ -173,7 +173,7 @@ class RubyVersionSelector {
     if (RubyVersionSelector.versions.includes(number))
       return `/${this.category}-${number}${this.page}`;
     else
-      console,log(`${number} is not a Ruby version we know about.`);
+      console.log(`${number} is not a Ruby version we know about.`);
   }
 
   setup() {
