@@ -211,4 +211,25 @@ RubyVersionSelector.versions = await RubyVersionSelector.fetchVersions(window);
 
 RubyDocExtras.onSetup(RubyVersionSelector);
 
+// Search through DuckDuckGo
+class RubyDocSearch {
+  constructor(win) { this.document = win.document }
+
+  get searchBox() { return this.document.getElementById('rd-search-input') }
+  get form() { return this.searchBox.form }
+
+  get version() {
+    return this.document.location.pathname.split('/')[1].split('-')[1];
+  }
+
+  setup() {
+    let self = this;
+    this.form.action = "https://duckduckgo.com/";
+    this.form.addEventListener('submit', function() {
+      self.searchBox.value += ` site:ruby-doc.org intitle:"Ruby ${self.version}"`;
+    });
+  }
+}
+RubyDocExtras.onSetup(RubyDocSearch);
+
 RubyDocExtras.setup(window);
