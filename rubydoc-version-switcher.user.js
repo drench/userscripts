@@ -133,6 +133,8 @@ class RubyVersionSelector {
     this.document = win.document;
     let pathmatch = this.location.pathname.match(/^\/(stdlib|core)-/);
     this.category = pathmatch[1];
+    this.storage = win.sessionStorage;
+    this.window = win;
   }
 
   get location() { return this.document.location }
@@ -154,6 +156,11 @@ class RubyVersionSelector {
     return this._versionSelector;
   }
 
+  get versions() {
+    this._versions ||= await this.fetchVersions();
+    return this._versions;
+  }
+
   get versionsDataList() {
     if (!this._versionsDataList) {
       let dl = this.document.createElement('datalist');
@@ -169,8 +176,23 @@ class RubyVersionSelector {
     return this._versionsDataList;
   }
 
+  async fetchVersions() {
+    let current = this.storage.getItem('ruby-versions');
+    if (current) return JSON.parse(current);
+    let html = await (await this.window.fetch('/downloads/')).text();
+    let parser = new DOMParser();
+    let doc = parser.parseFromString(html, 'text/html');
+    current = Array.from(doc.querySelectorAll('h3'))
+      .map((e) => e.innerText)
+      .filter((t) => t.match(/^The .+ Base Distribution RDoc HTML$/))
+      .map((t) => t.replace(/^The (.+) Base.+$/, '$1'));
+
+    storage.setItem('ruby-versions', JSON.stringify(current));
+    return current;
+  }
+
   pageForVersion(number) {
-    if (RubyVersionSelector.versions.includes(number))
+    if (this.versions.includes(number))
       return `/${this.category}-${number}${this.page}`;
     else
       console.log(`${number} is not a Ruby version we know about.`);
@@ -191,23 +213,6 @@ class RubyVersionSelector {
     this.searchBox.parentNode.insertBefore(widget, this.searchBox);
   }
 }
-
-RubyVersionSelector.fetchVersions = async function(win) {
-  let storage = win.sessionStorage;
-  let current = storage.getItem('ruby-versions');
-  if (current) return JSON.parse(current);
-  let html = await (await win.fetch('/downloads/')).text();
-  let parser = new DOMParser();
-  let doc = parser.parseFromString(html, 'text/html');
-  current = Array.from(doc.querySelectorAll('h3'))
-    .map((e) => e.innerText)
-    .filter((t) => t.match(/^The .+ Base Distribution RDoc HTML$/))
-    .map((t) => t.replace(/^The (.+) Base.+$/, '$1'));
-
-  storage.setItem('ruby-versions', JSON.stringify(current));
-  return current;
-}
-RubyVersionSelector.versions = await RubyVersionSelector.fetchVersions(window);
 
 RubyDocExtras.onSetup(RubyVersionSelector);
 
