@@ -165,11 +165,12 @@ class FamilySearchTreeQuery {
 class FamilySearchFindAGraveQuery {
   constructor(memorial) { this.memorial = memorial }
   static rootUrl = "https://www.familysearch.org/search/record/results";
+  static collectionId = "2221801";
 
   get url() {
     return `${FamilySearchFindAGraveQuery.rootUrl}?` +
-      `external_record_id=${this.memorial.memorialId}&` +
-      "collection_id=2221801";
+      `q.externalRecordId=${this.memorial.memorialId}&` +
+      `f.collectionId=${FamilySearchFindAGraveQuery.collectionId}`;
   }
 }
 
