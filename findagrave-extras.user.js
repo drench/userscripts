@@ -93,7 +93,9 @@ class FindAGraveMemorial {
 
   get firstName() { return this.getPropertyPresence('firstName') }
   get lastName() { return this.getPropertyPresence('lastName') }
-  get maidenName() { return this.potentialSurnames.find(n => n != this.lastName) }
+  get maidenName() {
+    return this.potentialSurnames.find(n => n && n != this.lastName)
+  }
 
   get seeMoreMemorialLinks() {
     return(document
@@ -104,7 +106,10 @@ class FindAGraveMemorial {
   get potentialSurnames() {
     return(this._potentialSurnames ||=
       Array.from(
-        new Set(Array.from(this.seeMoreMemorialLinks).map(a => a.innerText))
+        new Set(
+          Array.from(this.seeMoreMemorialLinks)
+            .map(a => (new URL(a).searchParams.get("lastname")))
+        )
       )
     );
   }
