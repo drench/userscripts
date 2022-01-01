@@ -76,6 +76,7 @@ class FindAGraveMemorial {
     return birthLocationLabel && birthLocationLabel.innerText;
   }
 
+  get birthSurname() { return this.maidenName || this.lastName }
   get birthYear() { return parseInt(this.findagrave.birthYear, 10) }
 
   get buttonContainer() {
@@ -92,6 +93,21 @@ class FindAGraveMemorial {
 
   get firstName() { return this.getPropertyPresence('firstName') }
   get lastName() { return this.getPropertyPresence('lastName') }
+  get maidenName() { return this.potentialSurnames.find(n => n != this.lastName) }
+
+  get seeMoreMemorialLinks() {
+    return(document
+      .getElementsByClassName('see-more')[0]
+      .parentElement.querySelectorAll('a[href^="/memorial/search?"]'));
+  }
+
+  get potentialSurnames() {
+    return(this._potentialSurnames ||=
+      Array.from(
+        new Set(Array.from(this.seeMoreMemorialLinks).map(a => a.innerText))
+      )
+    );
+  }
 
   get memorialElement() {
     return this._memorialElement ||= document.getElementById('memNumberLabel');
@@ -111,7 +127,7 @@ class FamilySearchRecordQuery {
   get deathLikePlace() { return encodeURI(this.memorial.deathPlace || '') }
   get deathLikeDate() { return this.memorial.deathYear || '' }
   get givenName() { return encodeURI(this.memorial.firstName || '') }
-  get surname() { return encodeURI(this.memorial.lastName || '') }
+  get surname() { return encodeURI(this.memorial.birthSurname || '') }
 
   get url() {
     return `${FamilySearchRecordQuery.rootUrl}?` +
@@ -149,7 +165,7 @@ class FamilySearchTreeQuery {
   get self() {
     return([
       encodeURI(this.memorial.firstName),
-      encodeURI(this.memorial.lastName)
+      encodeURI(this.memorial.birthSurname)
     ].join(encodeURI("|")));
   }
 
