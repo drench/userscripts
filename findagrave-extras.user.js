@@ -92,6 +92,28 @@ class FindAGraveMemorial {
 
   get firstName() { return this.getPropertyPresence('firstName') }
   get lastName() { return this.getPropertyPresence('lastName') }
+  get lastNameAtBirth() { return this.maidenName || this.lastName }
+  get lastNameAtDeath() { return this.lastName }
+  get maidenName() {
+    return this.potentialSurnames.find(n => n && n != this.lastName)
+  }
+
+  get seeMoreMemorialLinks() {
+    return(document
+      .getElementsByClassName('see-more')[0]
+      .parentElement.querySelectorAll('a[href^="/memorial/search?"]'));
+  }
+
+  get potentialSurnames() {
+    return(this._potentialSurnames ||=
+      Array.from(
+        new Set(
+          Array.from(this.seeMoreMemorialLinks)
+            .map(a => (new URL(a).searchParams.get("lastname")))
+        )
+      )
+    );
+  }
 
   get memorialElement() {
     return this._memorialElement ||= document.getElementById('memNumberLabel');
@@ -111,10 +133,11 @@ class FamilySearchRecordQuery {
   get deathLikePlace() { return encodeURI(this.memorial.deathPlace || '') }
   get deathLikeDate() { return this.memorial.deathYear || '' }
   get givenName() { return encodeURI(this.memorial.firstName || '') }
-  get surname() { return encodeURI(this.memorial.lastName || '') }
+  get surname() { return encodeURI(this.memorial.lastNameAtBirth || '') }
+  get surname1() { return encodeURI(this.memorial.lastNameAtDeath || '') }
 
   get url() {
-    return `${FamilySearchRecordQuery.rootUrl}?` +
+    let _url = `${FamilySearchRecordQuery.rootUrl}?` +
       `q.givenName=${this.givenName}&` +
       `q.surname=${this.surname}&` +
       `q.birthLikePlace=${this.birthLikePlace}&` +
@@ -123,12 +146,23 @@ class FamilySearchRecordQuery {
       `q.deathLikePlace=${this.deathLikePlace}&` +
       `q.deathLikeDate.from=${this.deathLikeDate}&` +
       `q.deathLikeDate.to=${this.deathLikeDate}`;
+
+    if (this.surname != this.surname1) {
+      _url += `&q.surname.1=${this.surname1}`
+    }
+
+    return _url;
   }
 }
 
 class FamilySearchTreeQuery {
   constructor(memorial) { this.memorial = memorial }
   static rootUrl = "https://www.familysearch.org/tree/find/name";
+
+  get alternateName1() {
+    if (this.memorial.lastNameAtBirth == this.memorial.lastNameAtDeath) return "";
+    return ["", encodeURI(this.memorial.lastNameAtDeath), "0", "0"].join(encodeURI("|"));
+  }
 
   get birth() {
     let year = this.memorial.birthYear || "";
@@ -149,7 +183,7 @@ class FamilySearchTreeQuery {
   get self() {
     return([
       encodeURI(this.memorial.firstName),
-      encodeURI(this.memorial.lastName)
+      encodeURI(this.memorial.lastNameAtBirth)
     ].join(encodeURI("|")));
   }
 
@@ -158,7 +192,8 @@ class FamilySearchTreeQuery {
       `self=${this.self}&` +
       "gender=&" +
       `birth=${this.birth}&` +
-      `death=${this.death}`;
+      `death=${this.death}&` +
+      `alternateName1=${this.alternateName1}&`;
   }
 }
 
