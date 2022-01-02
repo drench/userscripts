@@ -133,7 +133,7 @@ class FamilySearchRecordQuery {
   }
   get deathLikePlace() { return encodeURI(this.memorial.deathPlace || '') }
   get deathLikeDate() { return this.memorial.deathYear || '' }
-  get deathSurname() { return encodeURI(this.memorial.lastname || '') }
+  get deathSurname() { return encodeURI(this.memorial.lastName || '') }
   get givenName() { return encodeURI(this.memorial.firstName || '') }
   get surname() { return encodeURI(this.memorial.lastName || '') }
 
