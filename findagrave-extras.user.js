@@ -128,29 +128,42 @@ class FamilySearchRecordQuery {
 
   get birthLikePlace() { return encodeURI(this.memorial.birthPlace || '') }
   get birthLikeDate() { return this.memorial.birthYear || '' }
+  get birthSurname() {
+    return encodeURI(this.memorial.maidenName || this.memorial.lastname || '');
+  }
   get deathLikePlace() { return encodeURI(this.memorial.deathPlace || '') }
   get deathLikeDate() { return this.memorial.deathYear || '' }
+  get deathSurname() { return encodeURI(this.memorial.lastname || '') }
   get givenName() { return encodeURI(this.memorial.firstName || '') }
-  get maidenName() { return encodeURI(this.memorial.maidenName || '') }
   get surname() { return encodeURI(this.memorial.lastName || '') }
 
   get url() {
-    return `${FamilySearchRecordQuery.rootUrl}?` +
+    let _url = `${FamilySearchRecordQuery.rootUrl}?` +
       `q.givenName=${this.givenName}&` +
-      `q.surname=${this.surname}&` +
-      `q.surname.1=${this.maidenName}&` +
+      `q.surname=${this.birthSurname}&` +
       `q.birthLikePlace=${this.birthLikePlace}&` +
       `q.birthLikeDate.from=${this.birthLikeDate}&` +
       `q.birthLikeDate.to=${this.birthLikeDate}&` +
       `q.deathLikePlace=${this.deathLikePlace}&` +
       `q.deathLikeDate.from=${this.deathLikeDate}&` +
       `q.deathLikeDate.to=${this.deathLikeDate}`;
+
+    if (this.birthSurname != this.deathSurname) {
+      _url += `&q.surname.1=${this.deathSurname}`
+    }
+
+    return _url;
   }
 }
 
 class FamilySearchTreeQuery {
   constructor(memorial) { this.memorial = memorial }
   static rootUrl = "https://www.familysearch.org/tree/find/name";
+
+  get alternateName1() {
+    if (this.memorial.lastName == this.memorial.maidenName) return "";
+    return ["", encodeURI(this.memorial.lastName), "0", "0"].join(encodeURI("|"));
+  }
 
   get birth() {
     let year = this.memorial.birthYear || "";
@@ -169,23 +182,21 @@ class FamilySearchTreeQuery {
   }
 
   get self() {
+    let surname = this.memorial.maidenName || this.memorial.lastName;
+
     return([
       encodeURI(this.memorial.firstName),
-      encodeURI(this.memorial.lastName)
+      encodeURI(surname)
     ].join(encodeURI("|")));
   }
 
   get url() {
-    let _url = `${FamilySearchTreeQuery.rootUrl}?` +
+    return `${FamilySearchTreeQuery.rootUrl}?` +
       `self=${this.self}&` +
       "gender=&" +
       `birth=${this.birth}&` +
-      `death=${this.death}`;
-
-    let altName = this.memorial.maidenName;
-    if (altName) _url += `alternateName1=%7C${encodeURI(altName)}`;
-
-    return _url;
+      `death=${this.death}&` +
+      `alternateName1=${this.alternateName1}&`;
   }
 }
 
