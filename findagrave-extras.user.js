@@ -76,7 +76,6 @@ class FindAGraveMemorial {
     return birthLocationLabel && birthLocationLabel.innerText;
   }
 
-  get birthSurname() { return this.maidenName || this.lastName }
   get birthYear() { return parseInt(this.findagrave.birthYear, 10) }
 
   get buttonContainer() {
@@ -132,12 +131,14 @@ class FamilySearchRecordQuery {
   get deathLikePlace() { return encodeURI(this.memorial.deathPlace || '') }
   get deathLikeDate() { return this.memorial.deathYear || '' }
   get givenName() { return encodeURI(this.memorial.firstName || '') }
-  get surname() { return encodeURI(this.memorial.birthSurname || '') }
+  get maidenName() { return encodeURI(this.memorial.maidenName || '') }
+  get surname() { return encodeURI(this.memorial.lastName || '') }
 
   get url() {
     return `${FamilySearchRecordQuery.rootUrl}?` +
       `q.givenName=${this.givenName}&` +
       `q.surname=${this.surname}&` +
+      `q.surname.1=${this.maidenName}&` +
       `q.birthLikePlace=${this.birthLikePlace}&` +
       `q.birthLikeDate.from=${this.birthLikeDate}&` +
       `q.birthLikeDate.to=${this.birthLikeDate}&` +
@@ -170,16 +171,21 @@ class FamilySearchTreeQuery {
   get self() {
     return([
       encodeURI(this.memorial.firstName),
-      encodeURI(this.memorial.birthSurname)
+      encodeURI(this.memorial.lastName)
     ].join(encodeURI("|")));
   }
 
   get url() {
-    return `${FamilySearchTreeQuery.rootUrl}?` +
+    let _url = `${FamilySearchTreeQuery.rootUrl}?` +
       `self=${this.self}&` +
       "gender=&" +
       `birth=${this.birth}&` +
       `death=${this.death}`;
+
+    let altName = this.memorial.maidenName;
+    if (altName) _url += `alternateName1=%7C${encodeURI(altName)}`;
+
+    return _url;
   }
 }
 
