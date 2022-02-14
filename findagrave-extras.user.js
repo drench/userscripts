@@ -52,7 +52,7 @@ class FindAGraveMemorial {
     opt ||= {};
 
     let attr = Object.assign({
-      className: 'btn btn-dark btn-dark btn-sm text-uppercase',
+      className: 'btn btn-dark border-darker btn-sm text-uppercase ml-2',
       style: {},
       target: '_blank',
       type: 'button'
