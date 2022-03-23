@@ -25,7 +25,7 @@ class FindAGraveMemorial {
   addFamilySearchRecordButton() {
     if (!this.buttonContainer) return;
     let button = this.createButton({
-      href: (new FamilySearchRecordQuery(this)).url,
+      href: (new FamilySearchQuery("search/record/results", this)).url,
       innerText: 'Record Search',
       title: 'Check FamilySearch records'
     });
@@ -35,7 +35,7 @@ class FindAGraveMemorial {
   addFamilySearchTreeButton() {
     if (!this.buttonContainer) return;
     let button = this.createButton({
-      href: (new FamilySearchTreeQuery(this)).url,
+      href: (new FamilySearchQuery("search/tree/results", this)).url,
       innerText: 'Tree Search',
       title: 'Check FamilySearch trees'
     });
@@ -124,9 +124,11 @@ class FindAGraveMemorial {
   }
 }
 
-class FamilySearchRecordQuery {
-  constructor(memorial) { this.memorial = memorial }
-  static rootUrl = "https://www.familysearch.org/search/record/results";
+class FamilySearchQuery {
+  constructor(rootUrl, memorial) {
+    this.rootUrl = `https://www.familysearch.org/${rootUrl}`;
+    this.memorial = memorial;
+  }
 
   get birthLikePlace() { return encodeURI(this.memorial.birthPlace || '') }
   get birthLikeDate() { return this.memorial.birthYear || '' }
@@ -137,7 +139,7 @@ class FamilySearchRecordQuery {
   get surname1() { return encodeURI(this.memorial.lastNameAtDeath || '') }
 
   get url() {
-    let _url = `${FamilySearchRecordQuery.rootUrl}?` +
+    let _url = `${this.rootUrl}?` +
       `q.givenName=${this.givenName}&` +
       `q.surname=${this.surname}&` +
       `q.birthLikePlace=${this.birthLikePlace}&` +
@@ -152,48 +154,6 @@ class FamilySearchRecordQuery {
     }
 
     return _url;
-  }
-}
-
-class FamilySearchTreeQuery {
-  constructor(memorial) { this.memorial = memorial }
-  static rootUrl = "https://www.familysearch.org/tree/find/name";
-
-  get alternateName1() {
-    if (this.memorial.lastNameAtBirth == this.memorial.lastNameAtDeath) return "";
-    return ["", encodeURI(this.memorial.lastNameAtDeath), "0", "0"].join(encodeURI("|"));
-  }
-
-  get birth() {
-    let year = this.memorial.birthYear || "";
-
-    return([
-      encodeURI(this.memorial.birthPlace || ""), `${year}-${year}`, 0, 1
-    ].join(encodeURI("|")));
-  }
-
-  get death() {
-    let year = this.memorial.deathYear || "";
-
-    return([
-      encodeURI(this.memorial.deathPlace || ""), `${year}-${year}`, 0, 1
-    ].join(encodeURI("|")));
-  }
-
-  get self() {
-    return([
-      encodeURI(this.memorial.firstName),
-      encodeURI(this.memorial.lastNameAtBirth)
-    ].join(encodeURI("|")));
-  }
-
-  get url() {
-    return `${FamilySearchTreeQuery.rootUrl}?` +
-      `self=${this.self}&` +
-      "gender=&" +
-      `birth=${this.birth}&` +
-      `death=${this.death}&` +
-      `alternateName1=${this.alternateName1}&`;
   }
 }
 
