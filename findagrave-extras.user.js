@@ -80,7 +80,7 @@ class FindAGraveMemorial {
 
   get buttonContainer() {
     return this._buttonContainer ||=
-      this.document.querySelector('.form-group.d-print-none');
+      this.document.querySelector('.mb-3.d-flex.d-print-none');
   }
 
   get deathPlace() {
