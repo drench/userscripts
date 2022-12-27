@@ -1,8 +1,7 @@
 // ==UserScript==
 // @name          Ruby Doc Extras
 // @description   Adds a version-switcher widget and other extras to ruby-doc.org
-// @include       https://ruby-doc.org/core-*
-// @include       https://ruby-doc.org/stdlib-*
+// @include       /^https:\/\/ruby-doc.org\/\d[\d\.]+\d\/.+/
 // @run-at        document-idle
 // ==/UserScript==
 
@@ -46,7 +45,7 @@ class UpdateUrlOnScroll {
   }
 
   get anchorElements() {
-    return Array.from(this.window.document.querySelectorAll("a[name^=method-]"));
+    return Array.from(this.window.document.querySelectorAll("div[id^=method-].method-detail"));
   }
 
   get topAnchors() {
@@ -70,7 +69,7 @@ class UpdateUrlOnScroll {
     let updateHeading = function() {
       if (self.topAnchor && self.currentAnchor != self.topAnchor) {
         self.currentAnchor = self.topAnchor;
-        self.window.history.pushState(null, null, `#${self.currentAnchor.name}`);
+        self.window.history.pushState(null, null, `#${self.currentAnchor.id}`);
       }
       else if (self.currentAnchor && self.window.scrollY == 0) {
         self.currentAnchor = undefined;
