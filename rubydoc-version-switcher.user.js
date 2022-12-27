@@ -3,6 +3,7 @@
 // @description   Adds a version-switcher widget and other extras to ruby-doc.org
 // @include       https://ruby-doc.org/core-*
 // @include       https://ruby-doc.org/stdlib-*
+// @run-at        document-idle
 // ==/UserScript==
 
 class RubyDocExtras {
@@ -128,6 +129,59 @@ class LinkToRubySource {
 }
 RubyDocExtras.onSetup(LinkToRubySource);
 
+// Search through DuckDuckGo
+class RubyDocSearch {
+  constructor(win) {
+    this.document = win.document
+    if (!this.searchBox) this.createSearchBox();
+  }
+
+  get searchBox() { return this.document.getElementById('rd-search-input') }
+  get form() { return this.searchBox.form }
+
+  get version() {
+    return this.document.location.pathname.split('/')[1].split('-')[1];
+  }
+
+  createSearchBox() {
+    let ul = this.document.querySelector("#actionbar ul.grids.g0");
+    if (!ul) throw "Cannot find #actionbar ul.grids.g0";
+
+    let li = this.document.createElement("li");
+    li.className="grid-5 right";
+    li.id = "rd-action-search";
+    let form = this.document.createElement("form");
+
+    let input = this.document.createElement("input");
+    input.id = "rd-search-input";
+    input.setAttribute("name", "q");
+    input.setAttribute("type", "text");
+    input.setAttribute("size", "20");
+    input.style.marginRight = "1em";
+
+    let submit = this.document.createElement("input");
+    submit.setAttribute("type", "submit");
+    submit.setAttribute("name", "sa");
+    submit.setAttribute("value", "Search");
+
+    form.appendChild(input);
+    form.appendChild(submit);
+    li.appendChild(form);
+    ul.appendChild(li);
+
+    return input;
+  }
+
+  setup() {
+    let self = this;
+    this.form.action = "https://duckduckgo.com/";
+    this.form.addEventListener('submit', function() {
+      self.searchBox.value += ` site:ruby-doc.org intitle:"Ruby ${self.version}"`;
+    });
+  }
+}
+RubyDocExtras.onSetup(RubyDocSearch);
+
 class RubyVersionSelector {
   constructor(win) {
     this.document = win.document;
@@ -210,26 +264,5 @@ RubyVersionSelector.fetchVersions = async function(win) {
 RubyVersionSelector.versions = await RubyVersionSelector.fetchVersions(window);
 
 RubyDocExtras.onSetup(RubyVersionSelector);
-
-// Search through DuckDuckGo
-class RubyDocSearch {
-  constructor(win) { this.document = win.document }
-
-  get searchBox() { return this.document.getElementById('rd-search-input') }
-  get form() { return this.searchBox.form }
-
-  get version() {
-    return this.document.location.pathname.split('/')[1].split('-')[1];
-  }
-
-  setup() {
-    let self = this;
-    this.form.action = "https://duckduckgo.com/";
-    this.form.addEventListener('submit', function() {
-      self.searchBox.value += ` site:ruby-doc.org intitle:"Ruby ${self.version}"`;
-    });
-  }
-}
-RubyDocExtras.onSetup(RubyDocSearch);
 
 RubyDocExtras.setup(window);
