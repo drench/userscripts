@@ -23,16 +23,17 @@ class RubyDocExtras {
 class AnchorActionBar {
   constructor(win) {
     this.window = win;
-    this.style = { position: "fixed", top: "0px", zIndex: "9999" };
+    this.style = { position: "fixed", zIndex: "9999" };
+    this.id = "actionbar";
   }
 
-  get actionbar() { return this.window.document.getElementById("actionbar") }
+  get element() { return this.window.document.getElementById(this.id) }
 
   setup() {
-    if (this.actionbar)
-      for (let s in this.style) this.actionbar.style[s] = this.style[s];
+    if (this.element)
+      for (let s in this.style) this.element.style[s] = this.style[s];
     else
-      console.warn("Cannot locate the #actionbar element", this);
+      console.warn(`Cannot locate the #${this.id} element`, this);
   }
 }
 RubyDocExtras.onSetup(AnchorActionBar);
@@ -41,15 +42,16 @@ class AnchorSideNav {
   constructor(win) {
     this.window = win;
     this.style = { position: "fixed" };
+    this.id = "vapp";
   }
 
-  get sideNav() { return this.window.document.getElementById("vapp") }
+  get element() { return this.window.document.getElementById(this.id) }
 
   setup() {
-    if (this.sideNav)
-      for (let s in this.style) this.sideNav.style[s] = this.style[s];
+    if (this.element)
+      for (let s in this.style) this.element.style[s] = this.style[s];
     else
-      console.warn("Cannot locate the #vapp element", this);
+      console.warn(`Cannot locate the #${this.id} element`, this);
   }
 }
 RubyDocExtras.onSetup(AnchorSideNav);
