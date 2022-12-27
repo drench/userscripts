@@ -127,7 +127,7 @@ class LinkToRubySource {
 
   setup() { this.sourceElements.forEach(li => { this.createLinkInElement(li) }) }
 }
-RubyDocExtras.onSetup(LinkToRubySource);
+// RubyDocExtras.onSetup(LinkToRubySource);
 
 // Search through DuckDuckGo
 class RubyDocSearch {
@@ -180,7 +180,7 @@ class RubyDocSearch {
     });
   }
 }
-RubyDocExtras.onSetup(RubyDocSearch);
+// RubyDocExtras.onSetup(RubyDocSearch);
 
 class RubyVersionSelector {
   constructor(win) {
@@ -261,8 +261,8 @@ RubyVersionSelector.fetchVersions = async function(win) {
   storage.setItem('ruby-versions', JSON.stringify(current));
   return current;
 }
-RubyVersionSelector.versions = await RubyVersionSelector.fetchVersions(window);
+// RubyVersionSelector.versions = await RubyVersionSelector.fetchVersions(window);
 
-RubyDocExtras.onSetup(RubyVersionSelector);
+// RubyDocExtras.onSetup(RubyVersionSelector);
 
 RubyDocExtras.setup(window);
