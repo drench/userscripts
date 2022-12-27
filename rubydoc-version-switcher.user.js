@@ -37,6 +37,23 @@ class AnchorActionBar {
 }
 RubyDocExtras.onSetup(AnchorActionBar);
 
+class AnchorSideNav {
+  constructor(win) {
+    this.window = win;
+    this.style = { position: "fixed" };
+  }
+
+  get sideNav() { return this.window.document.getElementById("vapp") }
+
+  setup() {
+    if (this.sideNav)
+      for (let s in this.style) this.sideNav.style[s] = this.style[s];
+    else
+      console.warn("Cannot locate the #vapp element", this);
+  }
+}
+RubyDocExtras.onSetup(AnchorSideNav);
+
 // Update the URL with the current anchor when scrolling
 class UpdateUrlOnScroll {
   constructor(win) {
