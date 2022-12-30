@@ -54,7 +54,7 @@ class AnchorSideNav {
       console.warn(`Cannot locate the #${this.id} element`, this);
   }
 }
-RubyDocExtras.onSetup(AnchorSideNav);
+// RubyDocExtras.onSetup(AnchorSideNav);
 
 // Update the URL with the current anchor when scrolling
 class UpdateUrlOnScroll {
