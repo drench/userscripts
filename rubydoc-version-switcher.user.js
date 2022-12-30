@@ -268,18 +268,16 @@ RubyVersionSelector.fetchVersions = async function(win) {
   let storage = win.sessionStorage;
   let current = storage.getItem('ruby-versions');
   if (current) return JSON.parse(current);
-  let html = await (await win.fetch('/downloads/')).text();
+  let html = await (await win.fetch('/')).text();
   let parser = new DOMParser();
   let doc = parser.parseFromString(html, 'text/html');
-  current = Array.from(doc.querySelectorAll('h3'))
-    .map((e) => e.innerText)
-    .filter((t) => t.match(/^The .+ Base Distribution RDoc HTML$/))
-    .map((t) => t.replace(/^The (.+) Base.+$/, '$1'));
+  current = Array.from(document.querySelector('ul.main').querySelectorAll('li span a'))
+    .map(a => a.pathname.replace(/^\//, ""));
 
   storage.setItem('ruby-versions', JSON.stringify(current));
   return current;
 }
-// RubyVersionSelector.versions = await RubyVersionSelector.fetchVersions(window);
+RubyVersionSelector.versions = await RubyVersionSelector.fetchVersions(window);
 
 // RubyDocExtras.onSetup(RubyVersionSelector);
 
