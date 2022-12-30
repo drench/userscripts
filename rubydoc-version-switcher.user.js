@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          Ruby Doc Extras
 // @description   Adds a version-switcher widget and other extras to ruby-doc.org
-// @include       /^https:\/\/ruby-doc.org\/\d[\d\.]+\d\/.+/
+// @match         https://ruby-doc.org/*
 // @run-at        document-idle
 // ==/UserScript==
 
