@@ -13,9 +13,7 @@ class RubyDocExtras {
   constructor(win) { this.window = win }
 
   setup() {
-    RubyDocExtras.setupClasses.forEach(cb => {
-      (new cb(this.window)).setup()
-    });
+    RubyDocExtras.setupClasses.forEach(cb => { (new cb(this.window)).setup() });
   }
 }
 
