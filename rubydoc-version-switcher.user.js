@@ -21,19 +21,17 @@ class RubyDocExtras {
 
 // Make the "action bar" stick to the top of the page
 class AnchorActionBar {
-  constructor(win) {
-    this.window = win;
-    this.style = { position: "fixed", zIndex: "9999" };
-    this.id = "actionbar";
-  }
-
-  get element() { return this.window.document.getElementById(this.id) }
+  constructor(win) { this.document = win.document }
 
   setup() {
-    if (this.element)
-      for (let s in this.style) this.element.style[s] = this.style[s];
-    else
-      console.warn(`Cannot locate the #${this.id} element`, this);
+    let actionbar = this.document.getElementById("actionbar");
+    let contentDiv = this.document.querySelector("div.wrapper.hdiv");
+
+    if (actionbar && contentDiv) {
+      actionbar.style.position = "fixed";
+      actionbar.style.zIndex = "9999";
+      contentDiv.style.paddingTop = "32px";
+    }
   }
 }
 RubyDocExtras.onSetup(AnchorActionBar);
