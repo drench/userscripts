@@ -1,8 +1,7 @@
 // ==UserScript==
 // @name          Ruby Doc Extras
 // @description   Adds a version-switcher widget and other extras to ruby-doc.org
-// @include       https://ruby-doc.org/core-*
-// @include       https://ruby-doc.org/stdlib-*
+// @match         https://ruby-doc.org/*
 // @run-at        document-idle
 // ==/UserScript==
 
@@ -14,26 +13,23 @@ class RubyDocExtras {
   constructor(win) { this.window = win }
 
   setup() {
-    RubyDocExtras.setupClasses.forEach(cb => {
-      (new cb(this.window)).setup()
-    });
+    RubyDocExtras.setupClasses.forEach(cb => { (new cb(this.window)).setup() });
   }
 }
 
 // Make the "action bar" stick to the top of the page
 class AnchorActionBar {
-  constructor(win) {
-    this.window = win;
-    this.style = { position: "fixed", top: "0px", zIndex: "9999" };
-  }
-
-  get actionbar() { return this.window.document.getElementById("actionbar") }
+  constructor(win) { this.document = win.document }
 
   setup() {
-    if (this.actionbar)
-      for (let s in this.style) this.actionbar.style[s] = this.style[s];
-    else
-      console.warn("Cannot locate the #actionbar element", this);
+    let actionbar = this.document.getElementById("actionbar");
+    let contentDiv = this.document.querySelector("div.wrapper.hdiv");
+
+    if (actionbar && contentDiv) {
+      actionbar.style.position = "fixed";
+      actionbar.style.zIndex = "9999";
+      contentDiv.style.paddingTop = "32px";
+    }
   }
 }
 RubyDocExtras.onSetup(AnchorActionBar);
@@ -46,7 +42,7 @@ class UpdateUrlOnScroll {
   }
 
   get anchorElements() {
-    return Array.from(this.window.document.querySelectorAll("a[name^=method-]"));
+    return Array.from(this.window.document.querySelectorAll("div[id^=method-].method-detail"));
   }
 
   get topAnchors() {
@@ -70,7 +66,7 @@ class UpdateUrlOnScroll {
     let updateHeading = function() {
       if (self.topAnchor && self.currentAnchor != self.topAnchor) {
         self.currentAnchor = self.topAnchor;
-        self.window.history.pushState(null, null, `#${self.currentAnchor.name}`);
+        self.window.history.pushState(null, null, `#${self.currentAnchor.id}`);
       }
       else if (self.currentAnchor && self.window.scrollY == 0) {
         self.currentAnchor = undefined;
@@ -87,162 +83,45 @@ class UpdateUrlOnScroll {
 }
 RubyDocExtras.onSetup(UpdateUrlOnScroll);
 
-// Link the "In Files" filenames to their source on Github
-class LinkToRubySource {
-  constructor(win) { this.window = win }
-
-  get baseUrl() {
-    return this._baseUrl ||= `https://github.com/ruby/ruby/tree/${this.versionTag}`;
-  }
-
-  get document() { return this.window.document }
-
-  get versionTag() {
-    let pathmatch = this.document.location.pathname.match(/^\/[a-z]+-([1-9]\.[0-9\.]+)/);
-    let version = pathmatch[1];
-    return `v${version.replace(/\./g, '_')}`;
-  }
-
-  get sourceElements() {
-    return this.document.querySelectorAll('#file-metadata .in-file');
-  }
-
-  url(filename) {
-    if (filename.endsWith('.c') || filename.endsWith('.y'))
-      return `${this.baseUrl}/${filename}`;
-    if (filename.endsWith('.rb')) return `${this.baseUrl}/lib/${filename}`;
-  }
-
-  createLinkInElement(element) {
-    let href = this.url(element.innerText);
-    if (!href) return;
-
-    let a = this.document.createElement('a');
-    a.href = href;
-    a.target = '_blank';
-    a.innerText = element.innerText;
-    element.innerText = '';
-    element.appendChild(a);
-  }
-
-  setup() { this.sourceElements.forEach(li => { this.createLinkInElement(li) }) }
-}
-RubyDocExtras.onSetup(LinkToRubySource);
-
-// Search through DuckDuckGo
-class RubyDocSearch {
-  constructor(win) {
-    this.document = win.document
-    if (!this.searchBox) this.createSearchBox();
-  }
-
-  get searchBox() { return this.document.getElementById('rd-search-input') }
-  get form() { return this.searchBox.form }
-
-  get version() {
-    return this.document.location.pathname.split('/')[1].split('-')[1];
-  }
-
-  createSearchBox() {
-    let ul = this.document.querySelector("#actionbar ul.grids.g0");
-    if (!ul) throw "Cannot find #actionbar ul.grids.g0";
-
-    let li = this.document.createElement("li");
-    li.className="grid-5 right";
-    li.id = "rd-action-search";
-    let form = this.document.createElement("form");
-
-    let input = this.document.createElement("input");
-    input.id = "rd-search-input";
-    input.setAttribute("name", "q");
-    input.setAttribute("type", "text");
-    input.setAttribute("size", "20");
-    input.style.marginRight = "1em";
-
-    let submit = this.document.createElement("input");
-    submit.setAttribute("type", "submit");
-    submit.setAttribute("name", "sa");
-    submit.setAttribute("value", "Search");
-
-    form.appendChild(input);
-    form.appendChild(submit);
-    li.appendChild(form);
-    ul.appendChild(li);
-
-    return input;
-  }
-
-  setup() {
-    let self = this;
-    this.form.action = "https://duckduckgo.com/";
-    this.form.addEventListener('submit', function() {
-      self.searchBox.value += ` site:ruby-doc.org intitle:"Ruby ${self.version}"`;
-    });
-  }
-}
-RubyDocExtras.onSetup(RubyDocSearch);
-
 class RubyVersionSelector {
   constructor(win) {
     this.document = win.document;
-    let pathmatch = this.location.pathname.match(/^\/(stdlib|core)-/);
-    this.category = pathmatch[1];
-  }
+    this.currentVersion = this.document.location.pathname.split("/")[1];
 
-  get location() { return this.document.location }
-  get page() { return this.location.pathname.replace(/^\/[^\/]+/, '') }
-
-  get searchBox() {
-    return this.document.getElementById('rd-action-search');
-  }
-
-  get versionSelector() {
-    if (!this._versionSelector) {
-      let input = this.document.createElement('input');
-      input.setAttribute('list', this.versionsDataList.id);
-      input.setAttribute('autocomplete', 'on');
-      input.setAttribute('placeholder', 'Ruby version…');
-      input.style.height = '1.3em';
-      this._versionSelector = input;
-    }
-    return this._versionSelector;
-  }
-
-  get versionsDataList() {
-    if (!this._versionsDataList) {
-      let dl = this.document.createElement('datalist');
-      dl.setAttribute('id', 'ruby_versions');
-      let doc = this.document;
-      RubyVersionSelector.versions.forEach(function(version) {
-        let opt = doc.createElement('option');
-        opt.innerText = version;
-        dl.appendChild(opt);
-      });
-      this._versionsDataList = dl;
-    }
-    return this._versionsDataList;
-  }
-
-  pageForVersion(number) {
-    if (RubyVersionSelector.versions.includes(number))
-      return `/${this.category}-${number}${this.page}`;
-    else
-      console.log(`${number} is not a Ruby version we know about.`);
+    let v = new Set(RubyVersionSelector.versions);
+    v.add(this.currentVersion);
+    this.versions = Array.from(v).sort().reverse();
   }
 
   setup() {
-    this.document.body.appendChild(this.versionsDataList);
-    let self = this;
-    this.versionSelector.addEventListener('input', function (event) {
-      let number = event.target.value.replace(/\s+/g, '');
-      let newpath = self.pageForVersion(number);
-      if (newpath) self.location.pathname = newpath;
+    let doc = this.document;
+    let versionLink = doc.querySelectorAll("#menubar li")[1];
+    if (!versionLink) return;
+
+    let li = this.document.createElement("li");
+    let select = this.document.createElement("select");
+    select.style.backgroundColor = "#666";
+    select.style.color = "#fff";
+    select.style.border = "none";
+    select.style.fontWeight = "bold";
+    select.style.fontSize = "medium";
+
+    this.versions.forEach(function(version) {
+      let opt = doc.createElement("option");
+      opt.innerText = version;
+      select.appendChild(opt);
+    });
+    select.value = this.currentVersion;
+
+    li.appendChild(select);
+
+    select.addEventListener("change", function() {
+      let urlParts = doc.location.href.split("/");
+      urlParts[3] = select.value;
+      doc.location.href = urlParts.join("/");
     });
 
-    let widget = this.document.createElement('li');
-    widget.className = 'grid-2 right';
-    widget.appendChild(this.versionSelector);
-    this.searchBox.parentNode.insertBefore(widget, this.searchBox);
+    doc.getElementById("menubar").replaceChild(li, versionLink);
   }
 }
 
@@ -250,13 +129,11 @@ RubyVersionSelector.fetchVersions = async function(win) {
   let storage = win.sessionStorage;
   let current = storage.getItem('ruby-versions');
   if (current) return JSON.parse(current);
-  let html = await (await win.fetch('/downloads/')).text();
+  let html = await (await win.fetch('/')).text();
   let parser = new DOMParser();
   let doc = parser.parseFromString(html, 'text/html');
-  current = Array.from(doc.querySelectorAll('h3'))
-    .map((e) => e.innerText)
-    .filter((t) => t.match(/^The .+ Base Distribution RDoc HTML$/))
-    .map((t) => t.replace(/^The (.+) Base.+$/, '$1'));
+  current = Array.from(document.querySelector('ul.main').querySelectorAll('li span a'))
+    .map(a => a.pathname.replace(/^\//, ""));
 
   storage.setItem('ruby-versions', JSON.stringify(current));
   return current;
