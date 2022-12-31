@@ -87,6 +87,10 @@ class RubyVersionSelector {
   constructor(win) {
     this.document = win.document;
     this.currentVersion = this.document.location.pathname.split("/")[1];
+
+    let v = new Set(RubyVersionSelector.versions);
+    v.add(this.currentVersion);
+    this.versions = Array.from(v).sort().reverse();
   }
 
   setup() {
@@ -102,7 +106,7 @@ class RubyVersionSelector {
     select.style.fontWeight = "bold";
     select.style.fontSize = "medium";
 
-    RubyVersionSelector.versions.forEach(function(version) {
+    this.versions.forEach(function(version) {
       let opt = doc.createElement("option");
       opt.innerText = version;
       select.appendChild(opt);
