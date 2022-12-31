@@ -132,64 +132,38 @@ class LinkToRubySource {
 class RubyVersionSelector {
   constructor(win) {
     this.document = win.document;
-    let pathmatch = this.location.pathname.match(/^\/(stdlib|core)-/);
-    this.category = pathmatch[1];
-  }
-
-  get location() { return this.document.location }
-  get page() { return this.location.pathname.replace(/^\/[^\/]+/, '') }
-
-  get searchBox() {
-    return this.document.getElementById('rd-action-search');
-  }
-
-  get versionSelector() {
-    if (!this._versionSelector) {
-      let input = this.document.createElement('input');
-      input.setAttribute('list', this.versionsDataList.id);
-      input.setAttribute('autocomplete', 'on');
-      input.setAttribute('placeholder', 'Ruby version…');
-      input.style.height = '1.3em';
-      this._versionSelector = input;
-    }
-    return this._versionSelector;
-  }
-
-  get versionsDataList() {
-    if (!this._versionsDataList) {
-      let dl = this.document.createElement('datalist');
-      dl.setAttribute('id', 'ruby_versions');
-      let doc = this.document;
-      RubyVersionSelector.versions.forEach(function(version) {
-        let opt = doc.createElement('option');
-        opt.innerText = version;
-        dl.appendChild(opt);
-      });
-      this._versionsDataList = dl;
-    }
-    return this._versionsDataList;
-  }
-
-  pageForVersion(number) {
-    if (RubyVersionSelector.versions.includes(number))
-      return `/${this.category}-${number}${this.page}`;
-    else
-      console.log(`${number} is not a Ruby version we know about.`);
+    this.currentVersion = this.document.location.pathname.split("/")[1];
   }
 
   setup() {
-    this.document.body.appendChild(this.versionsDataList);
-    let self = this;
-    this.versionSelector.addEventListener('input', function (event) {
-      let number = event.target.value.replace(/\s+/g, '');
-      let newpath = self.pageForVersion(number);
-      if (newpath) self.location.pathname = newpath;
+    let doc = this.document;
+    let versionLink = doc.querySelectorAll("#menubar li")[1];
+    if (!versionLink) return;
+
+    let li = this.document.createElement("li");
+    let select = this.document.createElement("select");
+    select.style.backgroundColor = "#666";
+    select.style.color = "#fff";
+    select.style.border = "none";
+    select.style.fontWeight = "bold";
+    select.style.fontSize = "medium";
+
+    RubyVersionSelector.versions.forEach(function(version) {
+      let opt = doc.createElement("option");
+      opt.innerText = version;
+      select.appendChild(opt);
+    });
+    select.value = this.currentVersion;
+
+    li.appendChild(select);
+
+    select.addEventListener("change", function() {
+      let urlParts = doc.location.href.split("/");
+      urlParts[3] = select.value;
+      doc.location.href = urlParts.join("/");
     });
 
-    let widget = this.document.createElement('li');
-    widget.className = 'grid-2 right';
-    widget.appendChild(this.versionSelector);
-    this.searchBox.parentNode.insertBefore(widget, this.searchBox);
+    doc.getElementById("menubar").replaceChild(li, versionLink);
   }
 }
 
@@ -208,6 +182,6 @@ RubyVersionSelector.fetchVersions = async function(win) {
 }
 RubyVersionSelector.versions = await RubyVersionSelector.fetchVersions(window);
 
-// RubyDocExtras.onSetup(RubyVersionSelector);
+RubyDocExtras.onSetup(RubyVersionSelector);
 
 RubyDocExtras.setup(window);
