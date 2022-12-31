@@ -38,24 +38,6 @@ class AnchorActionBar {
 }
 RubyDocExtras.onSetup(AnchorActionBar);
 
-class AnchorSideNav {
-  constructor(win) {
-    this.window = win;
-    this.style = { position: "fixed" };
-    this.id = "vapp";
-  }
-
-  get element() { return this.window.document.getElementById(this.id) }
-
-  setup() {
-    if (this.element)
-      for (let s in this.style) this.element.style[s] = this.style[s];
-    else
-      console.warn(`Cannot locate the #${this.id} element`, this);
-  }
-}
-// RubyDocExtras.onSetup(AnchorSideNav);
-
 // Update the URL with the current anchor when scrolling
 class UpdateUrlOnScroll {
   constructor(win) {
@@ -146,59 +128,6 @@ class LinkToRubySource {
   setup() { this.sourceElements.forEach(li => { this.createLinkInElement(li) }) }
 }
 // RubyDocExtras.onSetup(LinkToRubySource);
-
-// Search through DuckDuckGo
-class RubyDocSearch {
-  constructor(win) {
-    this.document = win.document
-    if (!this.searchBox) this.createSearchBox();
-  }
-
-  get searchBox() { return this.document.getElementById('rd-search-input') }
-  get form() { return this.searchBox.form }
-
-  get version() {
-    return this.document.location.pathname.split('/')[1].split('-')[1];
-  }
-
-  createSearchBox() {
-    let ul = this.document.querySelector("#actionbar ul.grids.g0");
-    if (!ul) throw "Cannot find #actionbar ul.grids.g0";
-
-    let li = this.document.createElement("li");
-    li.className="grid-5 right";
-    li.id = "rd-action-search";
-    let form = this.document.createElement("form");
-
-    let input = this.document.createElement("input");
-    input.id = "rd-search-input";
-    input.setAttribute("name", "q");
-    input.setAttribute("type", "text");
-    input.setAttribute("size", "20");
-    input.style.marginRight = "1em";
-
-    let submit = this.document.createElement("input");
-    submit.setAttribute("type", "submit");
-    submit.setAttribute("name", "sa");
-    submit.setAttribute("value", "Search");
-
-    form.appendChild(input);
-    form.appendChild(submit);
-    li.appendChild(form);
-    ul.appendChild(li);
-
-    return input;
-  }
-
-  setup() {
-    let self = this;
-    this.form.action = "https://duckduckgo.com/";
-    this.form.addEventListener('submit', function() {
-      self.searchBox.value += ` site:ruby-doc.org intitle:"Ruby ${self.version}"`;
-    });
-  }
-}
-// RubyDocExtras.onSetup(RubyDocSearch);
 
 class RubyVersionSelector {
   constructor(win) {
