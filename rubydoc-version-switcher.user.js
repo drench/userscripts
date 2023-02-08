@@ -132,7 +132,7 @@ RubyVersionSelector.fetchVersions = async function(win) {
   let html = await (await win.fetch('/')).text();
   let parser = new DOMParser();
   let doc = parser.parseFromString(html, 'text/html');
-  current = Array.from(document.querySelector('ul.main').querySelectorAll('li span a'))
+  current = Array.from(doc.querySelector('ul.main').querySelectorAll('li span a'))
     .map(a => a.pathname.replace(/^\//, ""));
 
   storage.setItem('ruby-versions', JSON.stringify(current));
