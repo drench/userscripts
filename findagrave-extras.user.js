@@ -19,6 +19,8 @@ class FindAGraveMemorial {
       title: 'Look up this grave on FamilySearch'
     });
     this.memorialElement.innerHTML = '';
+    this.memorialElement.classList.remove("hidden");
+    this.memorialElement.nextElementSibling.classList.add("hidden");
     return this.memorialElement.appendChild(link);
   }
 
