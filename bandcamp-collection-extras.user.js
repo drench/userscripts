@@ -4,7 +4,7 @@
 // @grant       unsafeWindow
 // @match       https://bandcamp.com/*
 // @run-at      document-idle
-// @version     1.0.0
+// @version     1.0.1
 // ==/UserScript==
 
 class BandCampCollection {
@@ -19,8 +19,8 @@ class BandCampCollection {
       return console.log("already initialized!");
     }
 
-    if (! this.collectionItemsElement) {
-      return console.log("No collectionItemsElement; cannot initialize");
+    if (this.collectionGrids.length == 0) {
+      return console.log("No collection-grid elements; cannot initialize");
     }
 
     this.populateInitialItems();
@@ -58,25 +58,18 @@ class BandCampCollection {
     return this._observerCallback;
   }
 
-  get collectionGrid() {
-    return this.collectionItemsElement.querySelector(".collection-grid");
+  get collectionGrids() {
+    return Array.from(this.document.getElementsByClassName("collection-grid"));
   }
 
   startObserver() {
-    if (this.collectionGrid) {
-      this.observer.observe(this.collectionGrid, { childList: true });
-    }
-    else {
-      console.log("Cannot find the collection-grid in the document.");
-    }
+    let observer = this.observer;
+    this.collectionGrids.forEach((gridNode) => {
+      observer.observe(gridNode, { childList: true });
+    });
   }
 
   get api() { return this.window.FanCollectionAPI }
-
-  get collectionItemsElement() {
-    return this.document.getElementById(`${this.collectionType}-items`);
-  }
-
   get document() { return this.window.document }
   get fanId() { return this.window.FanData.fan_id }
   get itemCache() { return this.window.ItemCache[this.collectionType] }
@@ -95,8 +88,10 @@ class BandCampCollection {
     }
 
     if (!itemAttr.is_purchasable) return;
+    if (itemNode.querySelector("div.price-display")) return;
 
     let priceDiv = this.document.createElement('div');
+    priceDiv.classList.add("price-display");
     priceDiv.innerText = this.formatPrice(itemAttr);
 
     let itemContainer =
