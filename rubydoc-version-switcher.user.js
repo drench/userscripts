@@ -22,8 +22,8 @@ class AnchorActionBar {
   constructor(win) { this.document = win.document }
 
   setup() {
-    let actionbar = this.document.getElementById("actionbar");
-    let contentDiv = this.document.querySelector("div.wrapper.hdiv");
+    const actionbar = this.document.getElementById("actionbar");
+    const contentDiv = this.document.querySelector("div.wrapper.hdiv");
 
     if (actionbar && contentDiv) {
       actionbar.style.position = "fixed";
@@ -62,8 +62,8 @@ class UpdateUrlOnScroll {
   get topAnchor() { return this.topAnchors[0] }
 
   setup() {
-    let self = this;
-    let updateHeading = function() {
+    const self = this;
+    const updateHeading = function() {
       if (self.topAnchor && self.currentAnchor != self.topAnchor) {
         self.currentAnchor = self.topAnchor;
         self.window.history.pushState(null, null, `#${self.currentAnchor.id}`);
@@ -88,18 +88,18 @@ class RubyVersionSelector {
     this.document = win.document;
     this.currentVersion = this.document.location.pathname.split("/")[1];
 
-    let v = new Set(RubyVersionSelector.versions);
+    const v = new Set(RubyVersionSelector.versions);
     v.add(this.currentVersion);
     this.versions = Array.from(v).sort().reverse();
   }
 
   setup() {
-    let doc = this.document;
-    let versionLink = doc.querySelectorAll("#menubar li")[1];
+    const doc = this.document;
+    const versionLink = doc.querySelectorAll("#menubar li")[1];
     if (!versionLink) return;
 
-    let li = this.document.createElement("li");
-    let select = this.document.createElement("select");
+    const li = this.document.createElement("li");
+    const select = this.document.createElement("select");
     select.style.backgroundColor = "#666";
     select.style.color = "#fff";
     select.style.border = "none";
@@ -107,7 +107,7 @@ class RubyVersionSelector {
     select.style.fontSize = "medium";
 
     this.versions.forEach(function(version) {
-      let opt = doc.createElement("option");
+      const opt = doc.createElement("option");
       opt.innerText = version;
       select.appendChild(opt);
     });
@@ -116,7 +116,7 @@ class RubyVersionSelector {
     li.appendChild(select);
 
     select.addEventListener("change", function() {
-      let urlParts = doc.location.href.split("/");
+      const urlParts = doc.location.href.split("/");
       urlParts[3] = select.value;
       doc.location.href = urlParts.join("/");
     });
@@ -126,12 +126,12 @@ class RubyVersionSelector {
 }
 
 RubyVersionSelector.fetchVersions = async function(win) {
-  let storage = win.sessionStorage;
+  const storage = win.sessionStorage;
   let current = storage.getItem('ruby-versions');
   if (current) return JSON.parse(current);
-  let html = await (await win.fetch('/')).text();
-  let parser = new DOMParser();
-  let doc = parser.parseFromString(html, 'text/html');
+  const html = await (await win.fetch('/')).text();
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, 'text/html');
   current = Array.from(doc.querySelector('ul.main').querySelectorAll('li span a'))
     .map(a => a.pathname.replace(/^\//, ""));
 
