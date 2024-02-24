@@ -26,8 +26,7 @@ class AnchorActionBar {
     const contentDiv = this.document.querySelector("div.wrapper.hdiv");
 
     if (actionbar && contentDiv) {
-      actionbar.style.position = "fixed";
-      actionbar.style.zIndex = "9999";
+      Object.assign(actionbar.style, { position: "fixed", zIndex: "9999" });
       contentDiv.style.paddingTop = "32px";
     }
   }
@@ -100,11 +99,13 @@ class RubyVersionSelector {
 
     const li = this.document.createElement("li");
     const select = this.document.createElement("select");
-    select.style.backgroundColor = "#666";
-    select.style.color = "#fff";
-    select.style.border = "none";
-    select.style.fontWeight = "bold";
-    select.style.fontSize = "medium";
+    Object.assign(select.style, {
+      backgroundColor: "#666",
+      color: "#fff",
+      border: "none",
+      fontWeight: "bold",
+      fontSize: "medium"
+    });
 
     this.versions.forEach(function(version) {
       const opt = doc.createElement("option");
