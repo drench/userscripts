@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        FindAGrave Extras
 // @description Adds links to FindAGrave pages
-// @include     /^https://www.findagrave.com/memorial/[0-9]+//
+// @match       https://www.findagrave.com/memorial/*/*
 // @run-at      document-idle
 // @version     1.0.0
 // ==/UserScript==
