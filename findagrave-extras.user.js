@@ -197,12 +197,12 @@ if (memorial.memorialId) {
   memorial.addFamilySearchRecordButton();
   memorial.addFamilySearchFindAGraveLink();
 
-  getInfoItems().forEach(el => {
-    el.addEventListener('click', event => {
-      const val = findagrave[el.getAttribute('itemprop')];
+  for (const element of getInfoItems()) {
+    element.addEventListener('click', event => {
+      const val = findagrave[element.getAttribute('itemprop')];
       navigator.clipboard.writeText(val);
     });
-    el.setAttribute('title', 'click to copy');
-    el.style.cursor = 'pointer';
-  });
+    element.setAttribute('title', 'click to copy');
+    element.style.cursor = 'pointer';
+  }
 };
