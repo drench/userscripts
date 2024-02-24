@@ -13,7 +13,9 @@ class RubyDocExtras {
   constructor(win) { this.window = win }
 
   setup() {
-    RubyDocExtras.setupClasses.forEach(cb => { (new cb(this.window)).setup() });
+    for (const callback of RubyDocExtras.setupClasses) {
+      (new callback(this.window)).setup();
+    }
   }
 }
 
@@ -48,7 +50,7 @@ class UpdateUrlOnScroll {
     return(this
       .anchorElements
       .map(e => ({ "el": e, "top": e.getBoundingClientRect().top }))
-      .sort(function (a, b) {
+      .sort((a, b) => {
         if (a.top > b.top) return 1;
         if (a.top < b.top) return -1;
         return 0;
@@ -62,7 +64,7 @@ class UpdateUrlOnScroll {
 
   setup() {
     const self = this;
-    const updateHeading = function() {
+    const updateHeading = () => {
       if (self.topAnchor && self.currentAnchor != self.topAnchor) {
         self.currentAnchor = self.topAnchor;
         self.window.history.pushState(null, null, `#${self.currentAnchor.id}`);
@@ -107,16 +109,16 @@ class RubyVersionSelector {
       fontSize: "medium"
     });
 
-    this.versions.forEach(function(version) {
+    for (const version of this.versions) {
       const opt = doc.createElement("option");
       opt.innerText = version;
       select.appendChild(opt);
-    });
+    }
     select.value = this.currentVersion;
 
     li.appendChild(select);
 
-    select.addEventListener("change", function() {
+    select.addEventListener("change", () => {
       const urlParts = doc.location.href.split("/");
       urlParts[3] = select.value;
       doc.location.href = urlParts.join("/");
@@ -126,7 +128,7 @@ class RubyVersionSelector {
   }
 }
 
-RubyVersionSelector.fetchVersions = async function(win) {
+RubyVersionSelector.fetchVersions = async (win) => {
   const storage = win.sessionStorage;
   let current = storage.getItem('ruby-versions');
   if (current) return JSON.parse(current);
