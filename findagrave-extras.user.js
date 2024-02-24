@@ -83,7 +83,7 @@ class FindAGraveMemorial {
 
   get birthPlace() {
     const birthLocationLabel = this.document.getElementById('birthLocationLabel');
-    return birthLocationLabel && birthLocationLabel.innerText;
+    return birthLocationLabel?.innerText;
   }
 
   get birthYear() { return parseInt(this.findagrave.birthYear, 10) }
@@ -95,7 +95,7 @@ class FindAGraveMemorial {
 
   get deathPlace() {
     const deathLocationLabel = this.document.getElementById('deathLocationLabel');
-    return deathLocationLabel && deathLocationLabel.innerText;
+    return deathLocationLabel?.innerText;
   }
 
   get deathYear() { return parseInt(this.findagrave.deathYear, 10) }
@@ -186,8 +186,8 @@ const getInfoItems = function () {
 
 const originalName = function () {
   const th = document.evaluate('//th[text()="Original Name"]').iterateNext();
-  if (th && th.nextElementSibling) return th.nextElementSibling.innerText;
-  else return `${findagrave.firstName} ${findagrave.lastName}`;
+  return th?.nextElementSibling?.innerText ||
+    `${findagrave.firstName} ${findagrave.lastName}`;
 };
 
 const memorial = new FindAGraveMemorial(function () { return findagrave }, document);
