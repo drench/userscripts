@@ -3,6 +3,7 @@
 // @description Adds links to FindAGrave pages
 // @include     /^https://www.findagrave.com/memorial/[0-9]+//
 // @run-at      document-idle
+// @version     1.0.0
 // ==/UserScript==
 
 class FindAGraveMemorial {
@@ -13,47 +14,54 @@ class FindAGraveMemorial {
 
   addFamilySearchFindAGraveLink() {
     if (!this.memorialElement) return;
-    let link = this.createLink({
+
+    const link = this.createLink({
       href: (new FamilySearchFindAGraveQuery(this)).url,
       innerText: this.findagrave.memorialId,
       title: 'Look up this grave on FamilySearch'
     });
+
     this.memorialElement.innerHTML = '';
     this.memorialElement.classList.remove("hidden");
     this.memorialElement.nextElementSibling.classList.add("hidden");
+
     return this.memorialElement.appendChild(link);
   }
 
   addFamilySearchRecordButton() {
     if (!this.buttonContainer) return;
-    let button = this.createButton({
+
+    const button = this.createButton({
       href: (new FamilySearchQuery("search/record/results", this)).url,
       innerText: 'Record Search',
       title: 'Check FamilySearch records'
     });
+
     return this.buttonContainer.appendChild(button);
   }
 
   addFamilySearchTreeButton() {
     if (!this.buttonContainer) return;
-    let button = this.createButton({
+
+    const button = this.createButton({
       href: (new FamilySearchQuery("search/tree/results", this)).url,
       innerText: 'Tree Search',
       title: 'Check FamilySearch trees'
     });
+
     return this.buttonContainer.appendChild(button);
   }
 
   createLink(opt) {
     opt ||= {};
-    let attr = Object.assign({ className: 'add-link', target: '_blank' }, opt);
+    const attr = Object.assign({ className: 'add-link', target: '_blank' }, opt);
     return Object.assign(this.document.createElement('a'), attr);
   }
 
   createButton(opt) {
     opt ||= {};
 
-    let attr = Object.assign({
+    const attr = Object.assign({
       className: 'btn btn-dark border-darker btn-sm text-uppercase ml-2',
       style: {},
       target: '_blank',
@@ -74,7 +82,7 @@ class FindAGraveMemorial {
   isValid() { return !!this.findagrave }
 
   get birthPlace() {
-    let birthLocationLabel = this.document.getElementById('birthLocationLabel');
+    const birthLocationLabel = this.document.getElementById('birthLocationLabel');
     return birthLocationLabel && birthLocationLabel.innerText;
   }
 
@@ -86,7 +94,7 @@ class FindAGraveMemorial {
   }
 
   get deathPlace() {
-    let deathLocationLabel = this.document.getElementById('deathLocationLabel');
+    const deathLocationLabel = this.document.getElementById('deathLocationLabel');
     return deathLocationLabel && deathLocationLabel.innerText;
   }
 
@@ -172,12 +180,12 @@ class FamilySearchFindAGraveQuery {
 }
 
 const getInfoItems = function () {
-  var elements = Array.from(document.querySelectorAll('.mem-events *[itemprop]'));
+  const elements = Array.from(document.querySelectorAll('.mem-events *[itemprop]'));
   return elements.filter(el => findagrave.hasOwnProperty(el.getAttribute('itemprop')));
 };
 
 const originalName = function () {
-  let th = document.evaluate('//th[text()="Original Name"]').iterateNext();
+  const th = document.evaluate('//th[text()="Original Name"]').iterateNext();
   if (th && th.nextElementSibling) return th.nextElementSibling.innerText;
   else return `${findagrave.firstName} ${findagrave.lastName}`;
 };
@@ -191,7 +199,7 @@ if (memorial.memorialId) {
 
   getInfoItems().forEach(el => {
     el.addEventListener('click', event => {
-      var val = findagrave[el.getAttribute('itemprop')];
+      const val = findagrave[el.getAttribute('itemprop')];
       navigator.clipboard.writeText(val);
     });
     el.setAttribute('title', 'click to copy');
