@@ -7,9 +7,30 @@
 // ==/UserScript==
 
 class FindAGraveMemorial {
-  constructor(fg, doc) {
+  constructor(fg, win) {
     try { this.findagrave = fg() } catch(e) { }
-    this.document = doc;
+    this.clipboard = win.navigator.clipboard;
+    this.document = win.document;
+  }
+
+  get infoItems() {
+    const elements = Array.from(this.document.querySelectorAll('.mem-events *[itemprop]'));
+    const self = this;
+    return elements.filter(el => {
+      return self.findagrave.hasOwnProperty(el.getAttribute('itemprop'));
+    });
+  }
+
+  addClickToCopyForInfoItems() {
+    const self = this;
+    for (const element of this.infoItems) {
+      element.addEventListener('click', event => {
+        const val = self.findagrave[element.getAttribute('itemprop')];
+        this.clipboard.writeText(val);
+      });
+      element.setAttribute('title', 'click to copy');
+      element.style.cursor = 'pointer';
+    }
   }
 
   addFamilySearchFindAGraveLink() {
@@ -179,30 +200,11 @@ class FamilySearchFindAGraveQuery {
   }
 }
 
-const getInfoItems = function () {
-  const elements = Array.from(document.querySelectorAll('.mem-events *[itemprop]'));
-  return elements.filter(el => findagrave.hasOwnProperty(el.getAttribute('itemprop')));
-};
-
-const originalName = function () {
-  const th = document.evaluate('//th[text()="Original Name"]').iterateNext();
-  return th?.nextElementSibling?.innerText ||
-    `${findagrave.firstName} ${findagrave.lastName}`;
-};
-
-const memorial = new FindAGraveMemorial(function () { return findagrave }, document);
+const memorial = new FindAGraveMemorial(function () { return findagrave }, window);
 
 if (memorial.memorialId) {
   memorial.addFamilySearchTreeButton();
   memorial.addFamilySearchRecordButton();
   memorial.addFamilySearchFindAGraveLink();
-
-  for (const element of getInfoItems()) {
-    element.addEventListener('click', event => {
-      const val = findagrave[element.getAttribute('itemprop')];
-      navigator.clipboard.writeText(val);
-    });
-    element.setAttribute('title', 'click to copy');
-    element.style.cursor = 'pointer';
-  }
-};
+  memorial.addClickToCopyForInfoItems();
+}
