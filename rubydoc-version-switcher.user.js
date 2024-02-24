@@ -3,6 +3,7 @@
 // @description   Adds a version-switcher widget and other extras to ruby-doc.org
 // @match         https://ruby-doc.org/*
 // @run-at        document-idle
+// @version       1.0.0
 // ==/UserScript==
 
 class RubyDocExtras {
