@@ -5,13 +5,24 @@
 // @supportURL  https://github.com/drench/userscripts
 // @match       https://www.findagrave.com/memorial/*/*
 // @run-at      document-idle
-// @version     1.0.1
+// @version     1.0.2
 // ==/UserScript==
 
 class FindAGraveMemorial {
+  static setupCallbacks = [];
+  static onSetup(callback) { FindAGraveMemorial.setupCallbacks.push(callback) }
+
   constructor(win) {
     this.clipboard = win.navigator.clipboard;
     this.document = win.document;
+  }
+
+  setup() {
+    if (this.memorialId) {
+      for (const callback of FindAGraveMemorial.setupCallbacks) {
+        callback(this);
+      }
+    }
   }
 
   get findagrave() { return this.document.findagrave }
@@ -207,6 +218,26 @@ class FindAGraveMemorial {
   }
 }
 
+const AddClickToCopyForInfoItems = (findagrave) => {
+  findagrave.addClickToCopyForInfoItems();
+};
+FindAGraveMemorial.onSetup(AddClickToCopyForInfoItems);
+
+const AddFamilySearchFindAGraveLink = (findagrave) => {
+  findagrave.addFamilySearchFindAGraveLink();
+};
+FindAGraveMemorial.onSetup(AddFamilySearchFindAGraveLink);
+
+const AddFamilySearchRecordButton = (findagrave) => {
+  findagrave.addFamilySearchRecordButton();
+};
+FindAGraveMemorial.onSetup(AddFamilySearchRecordButton);
+
+const AddFamilySearchTreeButton = (findagrave) => {
+    findagrave.addFamilySearchTreeButton();
+};
+FindAGraveMemorial.onSetup(AddFamilySearchTreeButton);
+
 // This class builds FamilySearch queries using a FindAGraveMemorial instance
 // (the `memorial` argument in the constructor)
 //
@@ -287,24 +318,6 @@ class FamilySearchFindAGraveQuery {
 // we can access it within this script without resorting to unsafeWindow:
 location.href = "javascript:(() => { document.findagrave = window.findagrave })()";
 
-const memorial = new FindAGraveMemorial(window);
-
 // This waits 1 second under the assumption that the `location.href` hack above
-// will have finished. Then, if there's a memorialId, we take that to mean this
-// is a legitimate memorial page. If that's the case, it calls 4 initialization
-// methods to set up the page changes that are the entire point of this UserScript.
-window.setTimeout(() => {
-  if (memorial.memorialId) {
-    memorial.addFamilySearchTreeButton();
-    memorial.addFamilySearchRecordButton();
-    memorial.addFamilySearchFindAGraveLink();
-    memorial.addClickToCopyForInfoItems();
-  }
-}, 1000);
-
-// I took a different route to page initialization in this UserScript:
-// https://github.com/drench/userscripts/blob/main/rubydoc-version-switcher.user.js
-//
-// In that one, each page element change is its own class, and each one
-// registers itself as a callback to be called `onSetup`.
-// I might try that here too, for fun(?)
+// will have finished. It should be safe to call setup() at that time.
+window.setTimeout(() => { (new FindAGraveMemorial(window)).setup() }, 1000);
