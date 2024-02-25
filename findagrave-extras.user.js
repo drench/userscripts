@@ -16,7 +16,7 @@ class FindAGraveMemorial {
   }
 
   // This returns an Array of elements on the page that have an "itemprop"
-  // attribute thas has a corresponding `findagrave` object property.
+  // attribute that has a corresponding `findagrave` object property.
   // See addClickToCopyForInfoItems() for how it's used.
   get infoItems() {
     const elements = Array.from(this.document.querySelectorAll('.mem-events *[itemprop]'));
@@ -114,7 +114,7 @@ class FindAGraveMemorial {
 
   // A helper that returns `findagrave` property elements "nicely" by returning
   // a string trimmed of whitespace, or an empty string if the property does not
-  // exist, or not a string.
+  // exist, or if the property value is not a string.
   getPropertyPresence(property) {
     if (!this.isValid()) return '';
     if (!this.findagrave.hasOwnProperty(property)) return '';
@@ -267,9 +267,9 @@ class FamilySearchFindAGraveQuery {
 // is the primary data source for building search queries. There are some
 // problems with this.
 //
-// First, for reasons I don't yet understand, we need to
-// reference it as simply `findagrave`; I had hoped it would be available via
-// `window.findagrave` but at least in the context of a UserScript, we cannot.
+// First, for reasons I don't yet understand, we need to reference it as simply
+// `findagrave`; I had hoped it would be available via `window.findagrave` but
+// at least in the context of a UserScript, we cannot.
 //
 // Second, also for reasons I don't yet understand, referencing `findagrave`
 // directly does not seem to work. The workaround is to instead return the
@@ -277,23 +277,22 @@ class FamilySearchFindAGraveQuery {
 //
 // This is a long-winded way of saying I wish this constructor could be just
 // `new FindAGraveMemorial(window)` and have the class derive `findagrave` from
-// `findagrave.window`, but that doesn't work. I'd love to find out why!
+// `window.findagrave`, but that doesn't work. I'd love to find out why!
 const memorial = new FindAGraveMemorial(function () { return findagrave }, window);
 
 // If there's a memorialId, we take that to mean this is a legitimate memorial
 // page. If that's the case, this calls 4 initialization methods to set up the
 // page changes that are the entire point of this UserScript.
-//
-// I took a different route in this UserScript:
-// https://github.com/drench/userscripts/blob/main/rubydoc-version-switcher.user.js
-//
-// In that one, each page element change is its own class, and each one
-// registers itself as a callback to be called `onSetup`.
-// I might try that here too, for fun(?)
-
 if (memorial.memorialId) {
   memorial.addFamilySearchTreeButton();
   memorial.addFamilySearchRecordButton();
   memorial.addFamilySearchFindAGraveLink();
   memorial.addClickToCopyForInfoItems();
 }
+
+// I took a different route to page initialization in this UserScript:
+// https://github.com/drench/userscripts/blob/main/rubydoc-version-switcher.user.js
+//
+// In that one, each page element change is its own class, and each one
+// registers itself as a callback to be called `onSetup`.
+// I might try that here too, for fun(?)
