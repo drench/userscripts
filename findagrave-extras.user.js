@@ -5,15 +5,16 @@
 // @supportURL  https://github.com/drench/userscripts
 // @match       https://www.findagrave.com/memorial/*/*
 // @run-at      document-idle
-// @version     1.0.0
+// @version     1.0.1
 // ==/UserScript==
 
 class FindAGraveMemorial {
-  constructor(fg, win) {
-    try { this.findagrave = fg() } catch(e) { }
+  constructor(win) {
     this.clipboard = win.navigator.clipboard;
     this.document = win.document;
   }
+
+  get findagrave() { return this.document.findagrave }
 
   // This returns an Array of elements on the page that have an "itemprop"
   // attribute that has a corresponding `findagrave` object property.
@@ -264,31 +265,42 @@ class FamilySearchFindAGraveQuery {
 }
 
 // The global `findagrave` object, which the findagrave.com page gives us,
-// is the primary data source for building search queries. There are some
-// problems with this.
+// is the primary data source for building search queries. It's incredibly
+// useful but there are some problems getting access to it.
 //
-// First, for reasons I don't yet understand, we need to reference it as simply
-// `findagrave`; I had hoped it would be available via `window.findagrave` but
-// at least in the context of a UserScript, we cannot.
+// In order to reference the page's `findagrave` global, this uses a
+// `location.href` hack to copy `window.findagrave` (which this script can't
+// access) to `document.findagrave` (which this script *can* access).
 //
-// Second, also for reasons I don't yet understand, referencing `findagrave`
-// directly does not seem to work. The workaround is to instead return the
-// `findagrave` object from a callback function.
+// Using `unsafeWindow` might have avoided this, but `unsafeWindow` is by
+// definition unsafe and highly discouraged.
 //
-// This is a long-winded way of saying I wish this constructor could be just
-// `new FindAGraveMemorial(window)` and have the class derive `findagrave` from
-// `window.findagrave`, but that doesn't work. I'd love to find out why!
-const memorial = new FindAGraveMemorial(function () { return findagrave }, window);
+// Second, that hack does not take effect immediately, so there's a 1 second
+// wait before attempting initialization. This is yet another hack.
+//
+// The https://developer.mozilla.org/en-US/docs/Web/API/Navigation_API may be a
+// way to avoid the wait-1-second hack since it could allow the script to
+// initialize after that location.href event finishes. But it's not safe to
+// count on this experimental feature yet.
 
-// If there's a memorialId, we take that to mean this is a legitimate memorial
-// page. If that's the case, this calls 4 initialization methods to set up the
-// page changes that are the entire point of this UserScript.
-if (memorial.memorialId) {
-  memorial.addFamilySearchTreeButton();
-  memorial.addFamilySearchRecordButton();
-  memorial.addFamilySearchFindAGraveLink();
-  memorial.addClickToCopyForInfoItems();
-}
+// This is a hack to copy the global `findagrave` object to the document so
+// we can access it within this script without resorting to unsafeWindow:
+location.href = "javascript:(() => { document.findagrave = window.findagrave })()";
+
+const memorial = new FindAGraveMemorial(window);
+
+// This waits 1 second under the assumption that the `location.href` hack above
+// will have finished. Then, if there's a memorialId, we take that to mean this
+// is a legitimate memorial page. If that's the case, it calls 4 initialization
+// methods to set up the page changes that are the entire point of this UserScript.
+window.setTimeout(() => {
+  if (memorial.memorialId) {
+    memorial.addFamilySearchTreeButton();
+    memorial.addFamilySearchRecordButton();
+    memorial.addFamilySearchFindAGraveLink();
+    memorial.addClickToCopyForInfoItems();
+  }
+}, 1000);
 
 // I took a different route to page initialization in this UserScript:
 // https://github.com/drench/userscripts/blob/main/rubydoc-version-switcher.user.js
