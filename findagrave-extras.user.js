@@ -1,6 +1,8 @@
 // ==UserScript==
 // @name        FindAGrave Extras
 // @description Adds links to FindAGrave pages
+// @author      Daniel Rench
+// @supportURL  https://github.com/drench/userscripts
 // @match       https://www.findagrave.com/memorial/*/*
 // @run-at      document-idle
 // @version     1.0.0
