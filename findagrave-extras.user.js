@@ -181,9 +181,9 @@ FindAGraveMemorial.onSetup(findagrave => {
   }
 
   const link = findagrave.createLink({
-    href: (new FamilySearchFindAGraveQuery(findagrave)).url,
+    href: FamilySearchFindAGraveQuery.url(findagrave.memorialId),
     innerText: findagrave.memorialId,
-    title: 'Look up this grave on FamilySearch'
+    title: "Look up this grave on FamilySearch"
   });
 
   memorialElement.innerHTML = "";
@@ -203,7 +203,7 @@ FindAGraveMemorial.onSetup(findagrave => {
   }
 
   const button = findagrave.createButton({
-    href: (new FamilySearchQuery("search/record/results", findagrave)).url,
+    href: FamilySearchQuery.record(findagrave).url,
     innerText: "Record Search",
     title: "Check FamilySearch records"
   });
@@ -221,7 +221,7 @@ FindAGraveMemorial.onSetup(findagrave => {
   }
 
   const button = findagrave.createButton({
-    href: (new FamilySearchQuery("search/tree/results", findagrave)).url,
+    href: FamilySearchQuery.tree(findagrave).url,
     innerText: 'Tree Search',
     title: 'Check FamilySearch trees'
   });
@@ -229,62 +229,63 @@ FindAGraveMemorial.onSetup(findagrave => {
   return findagrave.buttonContainer.appendChild(button);
 });
 
-// This class builds FamilySearch queries using a FindAGraveMemorial instance
-// (the `memorial` argument in the constructor)
+// This builds FamilySearch queries using a FindAGraveMemorial instance
+// (the `memorial` argument)
 //
 // As FamilySearch's record and tree search forms (maybe others?) take the same
 // query arguments, we use `rootUrl` to specify which type of query to build.
-class FamilySearchQuery {
-  constructor(rootUrl, memorial) {
-    this.rootUrl = `https://www.familysearch.org/${rootUrl}`;
-    this.memorial = memorial;
-  }
+const FamilySearchQueryBuilder = (urlPath, memorial) => {
+  const rootUrl = `https://www.familysearch.org/${urlPath}`;
 
-  // These getters map FindAGrave attributes to FamilySearch query values,
+  // These consts map FindAGrave attributes to FamilySearch query values,
   // encoding where necessary:
-  get birthLikePlace() { return encodeURI(this.memorial.birthPlace || '') }
-  get birthLikeDate() { return this.memorial.birthYear || '' }
-  get deathLikePlace() { return encodeURI(this.memorial.deathPlace || '') }
-  get deathLikeDate() { return this.memorial.deathYear || '' }
-  get givenName() { return encodeURI(this.memorial.firstName || '') }
-  get surname() { return encodeURI(this.memorial.lastNameAtBirth || '') }
-  get surname1() { return encodeURI(this.memorial.lastNameAtDeath || '') }
+  const birthLikePlace = encodeURI(memorial.birthPlace ?? '');
+  const birthLikeDate = memorial.birthYear ?? '';
+  const deathLikePlace = encodeURI(memorial.deathPlace ?? '');
+  const deathLikeDate = memorial.deathYear ?? '';
+  const givenName = encodeURI(memorial.firstName ?? '');
+  const surname = encodeURI(memorial.lastNameAtBirth ?? '');
+  const surname1 = encodeURI(memorial.lastNameAtDeath ?? '');
 
-  // Returns a search query URL built from the getters above:
-  get url() {
-    let _url = `${this.rootUrl}?` +
-      `q.givenName=${this.givenName}&` +
-      `q.surname=${this.surname}&` +
-      `q.birthLikePlace=${this.birthLikePlace}&` +
-      `q.birthLikeDate.from=${this.birthLikeDate}&` +
-      `q.birthLikeDate.to=${this.birthLikeDate}&` +
-      `q.deathLikePlace=${this.deathLikePlace}&` +
-      `q.deathLikeDate.from=${this.deathLikeDate}&` +
-      `q.deathLikeDate.to=${this.deathLikeDate}`;
+  // Build a search query URL from the consts above:
+  const query = [
+    `q.givenName=${givenName}`,
+    `q.surname=${surname}`,
+    `q.birthLikePlace=${birthLikePlace}`,
+    `q.birthLikeDate.from=${birthLikeDate}`,
+    `q.birthLikeDate.to=${birthLikeDate}`,
+    `q.deathLikePlace=${deathLikePlace}`,
+    `q.deathLikeDate.from=${deathLikeDate}`,
+    `q.deathLikeDate.to=${deathLikeDate}`
+  ];
 
-    if (this.surname != this.surname1) {
-      _url += `&q.surname.1=${this.surname1}`
-    }
+  if (surname != surname1) query.push(`q.surname.1=${surname1}`);
 
-    return _url;
+  return { url: `${rootUrl}?${query.join("&")}` }
+};
+
+const FamilySearchQuery = {
+  record: (findagrave) => {
+    return FamilySearchQueryBuilder("search/record/results", findagrave)
+  },
+  tree: (findagrave) => {
+    return FamilySearchQueryBuilder("search/tree/results", findagrave)
   }
-}
+};
 
 // Given a FinaAGrave memorial ID (derived from the FindAGraveMemorial object
 // passed into the constructor), this builds a query URL for this memorial on
 // FamilySearh. The idea being, this takes you directly to the FindAGrave record
 // for easy attachment to a person on FamilySearch.
-class FamilySearchFindAGraveQuery {
-  constructor(memorial) { this.memorial = memorial }
-  static rootUrl = "https://www.familysearch.org/search/record/results";
-  static collectionId = "2221801";
+const FamilySearchFindAGraveQuery = {
+  url: (memorialId) => {
+    const rootUrl = "https://www.familysearch.org/search/record/results";
+    const collectionId = "2221801";
 
-  get url() {
-    return `${FamilySearchFindAGraveQuery.rootUrl}?` +
-      `q.externalRecordId=${this.memorial.memorialId}&` +
-      `f.collectionId=${FamilySearchFindAGraveQuery.collectionId}`;
+    return `${rootUrl}?q.externalRecordId=${memorialId}&` +
+      `f.collectionId=${collectionId}`;
   }
-}
+};
 
 // The global `findagrave` object, which the findagrave.com page gives us,
 // is the primary data source for building search queries. It's incredibly
