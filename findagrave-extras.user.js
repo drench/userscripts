@@ -38,69 +38,6 @@ class FindAGraveMemorial {
     });
   }
 
-  // This adds an event on every infoItem element to copy that info
-  // to the clipboard when clicked. For example, this makes it so when clicking
-  // the death date, it copies that date (in "DD Mon YYYY" format) to the clipboard.
-  addClickToCopyForInfoItems() {
-    const self = this;
-    for (const element of this.infoItems) {
-      element.addEventListener('click', event => {
-        const val = self.findagrave[element.getAttribute('itemprop')];
-        this.clipboard.writeText(val);
-      });
-      element.setAttribute('title', 'click to copy');
-      element.style.cursor = 'pointer';
-    }
-  }
-
-  // This turns the memorial ID element into a link that will search for this
-  // FindAGrave record on FamilySearch.
-  addFamilySearchFindAGraveLink() {
-    if (!this.memorialElement) return;
-
-    const link = this.createLink({
-      href: (new FamilySearchFindAGraveQuery(this)).url,
-      innerText: this.findagrave.memorialId,
-      title: 'Look up this grave on FamilySearch'
-    });
-
-    this.memorialElement.innerHTML = '';
-    this.memorialElement.classList.remove("hidden");
-    this.memorialElement.nextElementSibling.classList.add("hidden");
-
-    return this.memorialElement.appendChild(link);
-  }
-
-  // This adds a "RECORD SEARCH" button to the page.
-  // When clicked, it sends a record search query to FamilySearch (as opposed
-  // to a tree search; see addFamilySearchTreeButton for that).
-  addFamilySearchRecordButton() {
-    if (!this.buttonContainer) return;
-
-    const button = this.createButton({
-      href: (new FamilySearchQuery("search/record/results", this)).url,
-      innerText: 'Record Search',
-      title: 'Check FamilySearch records'
-    });
-
-    return this.buttonContainer.appendChild(button);
-  }
-
-  // This adds a "TREE SEARCH" button to the page.
-  // When clicked, it sends a tree search query to FamilySearch (as opposed to a
-  // record search; see addFamilySearchRecordButton for that).
-  addFamilySearchTreeButton() {
-    if (!this.buttonContainer) return;
-
-    const button = this.createButton({
-      href: (new FamilySearchQuery("search/tree/results", this)).url,
-      innerText: 'Tree Search',
-      title: 'Check FamilySearch trees'
-    });
-
-    return this.buttonContainer.appendChild(button);
-  }
-
   // A helper to create a link (<a>) element with arbitrary attributes.
   createLink(opt) {
     opt ||= {};
@@ -218,25 +155,79 @@ class FindAGraveMemorial {
   }
 }
 
-const AddClickToCopyForInfoItems = (findagrave) => {
-  findagrave.addClickToCopyForInfoItems();
-};
-FindAGraveMemorial.onSetup(AddClickToCopyForInfoItems);
+FindAGraveMemorial.onSetup(findagrave => {
+  // This adds an event on every infoItem element to copy that info
+  // to the clipboard when clicked. For example, this makes it so when clicking
+  // the death date, it copies that date (in "DD Mon YYYY" format) to the clipboard.
 
-const AddFamilySearchFindAGraveLink = (findagrave) => {
-  findagrave.addFamilySearchFindAGraveLink();
-};
-FindAGraveMemorial.onSetup(AddFamilySearchFindAGraveLink);
+  for (const element of findagrave.infoItems) {
+    element.addEventListener("click", event => {
+      const val = findagrave[element.getAttribute("itemprop")];
+      findagrave.clipboard.writeText(val);
+    });
+    element.setAttribute("title", "click to copy");
+    element.style.cursor = "pointer";
+  }
+});
 
-const AddFamilySearchRecordButton = (findagrave) => {
-  findagrave.addFamilySearchRecordButton();
-};
-FindAGraveMemorial.onSetup(AddFamilySearchRecordButton);
+FindAGraveMemorial.onSetup(findagrave => {
+  // This turns the memorial ID element into a link that will search for this
+  // FindAGrave record on FamilySearch.
 
-const AddFamilySearchTreeButton = (findagrave) => {
-    findagrave.addFamilySearchTreeButton();
-};
-FindAGraveMemorial.onSetup(AddFamilySearchTreeButton);
+  const memorialElement = findagrave.memorialElement;
+
+  if (!memorialElement) {
+    return console.debug("Add FamilySearch FindAGrave Link: no memorialElement");
+  }
+
+  const link = findagrave.createLink({
+    href: (new FamilySearchFindAGraveQuery(findagrave)).url,
+    innerText: findagrave.memorialId,
+    title: 'Look up this grave on FamilySearch'
+  });
+
+  memorialElement.innerHTML = "";
+  memorialElement.classList.remove("hidden");
+  memorialElement.nextElementSibling.classList.add("hidden");
+
+  return memorialElement.appendChild(link);
+});
+
+FindAGraveMemorial.onSetup(findagrave => {
+  // This adds a "RECORD SEARCH" button to the page.
+  // When clicked, it sends a record search query to FamilySearch (as opposed
+  // to a tree search; see addFamilySearchTreeButton for that).
+
+  if (!findagrave.buttonContainer) {
+    return console.debug("Add FamilySearch Record Button: no buttonContainer");
+  }
+
+  const button = findagrave.createButton({
+    href: (new FamilySearchQuery("search/record/results", findagrave)).url,
+    innerText: "Record Search",
+    title: "Check FamilySearch records"
+  });
+
+  return findagrave.buttonContainer.appendChild(button);
+});
+
+FindAGraveMemorial.onSetup(findagrave => {
+  // This adds a "TREE SEARCH" button to the page.
+  // When clicked, it sends a tree search query to FamilySearch (as opposed to a
+  // record search; see addFamilySearchRecordButton for that).
+
+  if (!findagrave.buttonContainer) {
+    return console.debug("Add FamilySearch Tree Button: no buttonContainer");
+  }
+
+  const button = findagrave.createButton({
+    href: (new FamilySearchQuery("search/tree/results", findagrave)).url,
+    innerText: 'Tree Search',
+    title: 'Check FamilySearch trees'
+  });
+
+  return findagrave.buttonContainer.appendChild(button);
+});
 
 // This class builds FamilySearch queries using a FindAGraveMemorial instance
 // (the `memorial` argument in the constructor)
