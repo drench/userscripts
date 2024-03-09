@@ -12,17 +12,18 @@ class FindAGraveMemorial {
   static setupCallbacks = [];
   static onSetup(callback) { FindAGraveMemorial.setupCallbacks.push(callback) }
 
+  static setup(win) {
+    const memorial = new FindAGraveMemorial(win);
+    if (memorial.memorialId) {
+      for (const callback of FindAGraveMemorial.setupCallbacks) {
+        callback.bind(memorial).call();
+      }
+    }
+  }
+
   constructor(win) {
     this.clipboard = win.navigator.clipboard;
     this.document = win.document;
-  }
-
-  setup() {
-    if (this.memorialId) {
-      for (const callback of FindAGraveMemorial.setupCallbacks) {
-        callback.bind(this).call();
-      }
-    }
   }
 
   get findagrave() { return this.document.findagrave }
@@ -286,4 +287,4 @@ location.href = "javascript:(() => { document.findagrave = window.findagrave })(
 
 // This waits 1 second under the assumption that the `location.href` hack above
 // will have finished. It should be safe to call setup() at that time.
-window.setTimeout(() => { (new FindAGraveMemorial(window)).setup() }, 1000);
+window.setTimeout(() => { FindAGraveMemorial.setup(window) }, 1000);
