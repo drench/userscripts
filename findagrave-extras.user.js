@@ -27,13 +27,6 @@ class FindAGraveMemorial {
 
   get findagrave() { return this.document.findagrave }
 
-  // A helper to create a link (<a>) element with arbitrary attributes.
-  createLink(opt) {
-    opt ||= {};
-    const attr = Object.assign({ className: 'add-link', target: '_blank' }, opt);
-    return Object.assign(this.document.createElement('a'), attr);
-  }
-
   // A helper to create a button (actually a specially-styled <a> element) with
   // arbitrary attributes.
   createButton(opt) {
@@ -176,11 +169,15 @@ FindAGraveMemorial.onSetup(findagrave => {
     return console.debug("Add FamilySearch FindAGrave Link: no memorialElement");
   }
 
-  const link = findagrave.createLink({
-    href: FamilySearchFindAGraveQuery.url(findagrave.memorialId),
-    innerText: findagrave.memorialId,
-    title: "Look up this grave on FamilySearch"
-  });
+  const link = Object.assign(
+    findagrave.document.createElement("a"), {
+      className: 'add-link',
+      href: FamilySearchFindAGraveQuery.url(findagrave.memorialId),
+      innerText: findagrave.memorialId,
+      target: '_blank',
+      title: "Look up this grave on FamilySearch"
+    }
+  );
 
   memorialElement.innerHTML = "";
   memorialElement.classList.remove("hidden");
