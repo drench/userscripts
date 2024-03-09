@@ -169,10 +169,16 @@ FindAGraveMemorial.onSetup(findagrave => {
     return console.debug("Add FamilySearch FindAGrave Link: no memorialElement");
   }
 
+  const rootUrl = "https://www.familysearch.org/search/record/results";
+  const query = [
+    `q.externalRecordId=${findagrave.memorialId}`,
+    "f.collectionId=2221801"
+  ].join("&");
+
   const link = Object.assign(
     findagrave.document.createElement("a"), {
       className: 'add-link',
-      href: FamilySearchFindAGraveQuery.url(findagrave.memorialId),
+      href: `${rootUrl}?${query}`,
       innerText: findagrave.memorialId,
       target: '_blank',
       title: "Look up this grave on FamilySearch"
@@ -263,19 +269,6 @@ const FamilySearchQuery = {
   },
   tree(findagrave) {
     return FamilySearchQueryBuilder("search/tree/results", findagrave)
-  }
-};
-
-// Given a FinaAGrave memorial ID, this builds a query URL for the memorial on
-// FamilySearh. The idea being, this takes you directly to the FindAGrave record
-// for easy attachment to a person on FamilySearch.
-const FamilySearchFindAGraveQuery = {
-  url(memorialId) {
-    const rootUrl = "https://www.familysearch.org/search/record/results";
-    const collectionId = "2221801";
-
-    return `${rootUrl}?q.externalRecordId=${memorialId}&` +
-      `f.collectionId=${collectionId}`;
   }
 };
 
