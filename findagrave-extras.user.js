@@ -30,7 +30,7 @@ class FindAGraveMemorial {
   // A helper to create a button (actually a specially-styled <a> element) with
   // arbitrary attributes.
   createButton(opt) {
-    opt ||= {};
+    opt ??= {};
 
     const attr = Object.assign({
       className: 'btn btn-dark border-darker btn-sm text-uppercase ml-2',
@@ -38,7 +38,7 @@ class FindAGraveMemorial {
       target: '_blank',
       type: 'button'
     }, opt);
-    attr.style.marginInline ||= '3px';
+    attr.style.marginInline ??= '3px';
 
     return Object.assign(this.document.createElement('a'), attr);
   }
@@ -69,8 +69,7 @@ class FindAGraveMemorial {
 
   // Returns the page element containing the buttons ("SHARE", "SAVE TO", etc.)
   get buttonContainer() {
-    return this._buttonContainer ||=
-      this.document.querySelector('.mb-3.d-flex.d-print-none');
+    return this.document.querySelector(".mb-3.d-flex.d-print-none");
   }
 
   // Returns the place of death as a string, if it's available.
@@ -92,7 +91,7 @@ class FindAGraveMemorial {
   // Returns the last name at birth, if there's a maidenName available.
   // Otherwise, it returns the lastName. This of course may not be the actual
   // birth name, but it's the best we can do.
-  get lastNameAtBirth() { return this.maidenName || this.lastName }
+  get lastNameAtBirth() { return this.maidenName ?? this.lastName }
 
   // Returns what we believe to the the last name at death, which we are
   // assuming is the same as the lastName (it's the best guess we've got).
@@ -116,7 +115,7 @@ class FindAGraveMemorial {
   // Using the list of links to possible relatives, this scrapes the last names
   // from those elements and returns a unique array of them.
   get potentialSurnames() {
-    return(this._potentialSurnames ||=
+    return(this._potentialSurnames ??=
       Array.from(
         new Set(
           Array.from(this.seeMoreMemorialLinks)
@@ -128,7 +127,7 @@ class FindAGraveMemorial {
 
   // Returns the element containing the memorial ID number
   get memorialElement() {
-    return this._memorialElement ||= this.document.getElementById('memNumberLabel');
+    return this.document.getElementById("memNumberLabel");
   }
 
   // Returns the memorial ID for this grave
