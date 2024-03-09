@@ -144,16 +144,14 @@ FindAGraveMemorial.onSetup(function () {
   // infoItems are elements on the page that have an "itemprop"
   // attribute that has a corresponding `findagrave` object property
   const elements = this.document.querySelectorAll(".mem-events *[itemprop]");
-  let self = this;
-  const infoItems = Array.from(elements).filter(el => {
-    return self.getPropertyPresence(el.getAttribute("itemprop")).length > 0;
-  });
 
-  for (const element of infoItems) {
-    element.addEventListener("click", function(event) {
-      const val = self.getPropertyPresence(element.getAttribute("itemprop"));
-      if (val.length > 0) self.clipboard.writeText(val);
-    });
+  for (const element of elements) {
+    const propValue = this.getPropertyPresence(element.getAttribute("itemprop"));
+    if (propValue.length == 0) continue;
+
+    element.addEventListener("click", function() {
+      this.clipboard.writeText(propValue);
+    }.bind(this));
     element.setAttribute("title", "click to copy");
     element.style.cursor = "pointer";
   }
