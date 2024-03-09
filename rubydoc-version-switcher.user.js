@@ -9,7 +9,7 @@
 class RubyDocExtras {
   static setupClasses = [];
   static onSetup(klass) { RubyDocExtras.setupClasses.push(klass) }
-  static setup(doc) { (new RubyDocExtras(doc)).setup() }
+  static setup(win) { (new RubyDocExtras(win)).setup() }
 
   constructor(win) { this.window = win }
 
@@ -64,23 +64,22 @@ class UpdateUrlOnScroll {
   get topAnchor() { return this.topAnchors[0] }
 
   setup() {
-    const self = this;
-    const updateHeading = () => {
-      if (self.topAnchor && self.currentAnchor != self.topAnchor) {
-        self.currentAnchor = self.topAnchor;
-        self.window.history.pushState(null, null, `#${self.currentAnchor.id}`);
+    const updateHeading = function () {
+      if (this.topAnchor && this.currentAnchor != this.topAnchor) {
+        this.currentAnchor = this.topAnchor;
+        this.window.history.pushState(null, null, `#${this.currentAnchor.id}`);
       }
-      else if (self.currentAnchor && self.window.scrollY == 0) {
-        self.currentAnchor = undefined;
-        self.window.history.pushState(
+      else if (this.currentAnchor && this.window.scrollY == 0) {
+        this.currentAnchor = undefined;
+        this.window.history.pushState(
           null,
           null,
-          self.window.location.pathname + self.window.location.search
+          this.window.location.pathname + this.window.location.search
         );
       }
     };
 
-    this.window.addEventListener('scroll', updateHeading);
+    this.window.addEventListener('scroll', updateHeading.bind(this));
   }
 }
 RubyDocExtras.onSetup(UpdateUrlOnScroll);
