@@ -6,16 +6,12 @@
 // @version       1.0.0
 // ==/UserScript==
 
-class RubyDocExtras {
-  static setupClasses = [];
-  static onSetup(klass) { RubyDocExtras.setupClasses.push(klass) }
-  static setup(win) { (new RubyDocExtras(win)).setup() }
-
-  constructor(win) { this.window = win }
-
-  setup() {
-    for (const callback of RubyDocExtras.setupClasses) {
-      (new callback(this.window)).setup();
+const RubyDocExtras = {
+  setupClasses: [],
+  onSetup(klass) { this.setupClasses.push(klass) },
+  setup(win) {
+    for (const klass of this.setupClasses) {
+      (new klass(win)).setup();
     }
   }
 }
