@@ -11,15 +11,20 @@ const RubyDocExtras = {
   onSetup(klass) { this.setupClasses.push(klass) },
   setup(win) {
     for (const klass of this.setupClasses) {
-      (new klass(win)).setup();
+      if (klass.setup) {
+        console.log("NEW STYLE", klass);
+        klass.setup.bind(win).call();
+      }
+      else {
+        console.log("OLD STYLE", klass);
+        (new klass(win)).setup();
+      }
     }
   }
 }
 
 // Make the "action bar" stick to the top of the page
-class AnchorActionBar {
-  constructor(win) { this.document = win.document }
-
+const AnchorActionBar = {
   setup() {
     const actionbar = this.document.getElementById("actionbar");
     const contentDiv = this.document.querySelector("div.wrapper.hdiv");
@@ -29,7 +34,7 @@ class AnchorActionBar {
       contentDiv.style.paddingTop = "32px";
     }
   }
-}
+};
 RubyDocExtras.onSetup(AnchorActionBar);
 
 // Update the URL with the current anchor when scrolling
@@ -80,23 +85,20 @@ class UpdateUrlOnScroll {
 }
 RubyDocExtras.onSetup(UpdateUrlOnScroll);
 
-class RubyVersionSelector {
-  constructor(win) {
-    this.document = win.document;
-    this.currentVersion = this.document.location.pathname.split("/")[1];
-
-    const v = new Set(RubyVersionSelector.versions);
-    v.add(this.currentVersion);
-    this.versions = Array.from(v).sort().reverse();
-  }
-
+const RubyVersionSelector = {
   setup() {
     const doc = this.document;
     const versionLink = doc.querySelectorAll("#menubar li")[1];
     if (!versionLink) return;
 
-    const li = this.document.createElement("li");
-    const select = this.document.createElement("select");
+    const currentVersion = doc.location.pathname.split("/")[1];
+
+    const versionSet = new Set(RubyVersionSelector.versions);
+    versionSet.add(currentVersion);
+    const versions = Array.from(versionSet).sort().reverse();
+
+    const li = doc.createElement("li");
+    const select = doc.createElement("select");
     Object.assign(select.style, {
       backgroundColor: "#666",
       color: "#fff",
@@ -105,12 +107,12 @@ class RubyVersionSelector {
       fontSize: "medium"
     });
 
-    for (const version of this.versions) {
+    for (const version of versions) {
       const opt = doc.createElement("option");
       opt.innerText = version;
       select.appendChild(opt);
     }
-    select.value = this.currentVersion;
+    select.value = currentVersion;
 
     li.appendChild(select);
 
@@ -122,9 +124,9 @@ class RubyVersionSelector {
 
     doc.getElementById("menubar").replaceChild(li, versionLink);
   }
-}
+};
 
-RubyVersionSelector.fetchVersions = async (win) => {
+const fetchVersions = async (win) => {
   const storage = win.sessionStorage;
   let current = storage.getItem('ruby-versions');
   if (current) return JSON.parse(current);
@@ -137,7 +139,7 @@ RubyVersionSelector.fetchVersions = async (win) => {
   storage.setItem('ruby-versions', JSON.stringify(current));
   return current;
 }
-RubyVersionSelector.versions = await RubyVersionSelector.fetchVersions(window);
+RubyVersionSelector.versions = await fetchVersions(window);
 
 RubyDocExtras.onSetup(RubyVersionSelector);
 
