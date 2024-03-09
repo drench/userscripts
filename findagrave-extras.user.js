@@ -202,7 +202,7 @@ FindAGraveMemorial.onSetup(findagrave => {
   }
 
   const button = findagrave.createButton({
-    href: FamilySearchQuery.record(findagrave).url,
+    href: FamilySearchQuery("search/record/results", findagrave).url,
     innerText: "Record Search",
     title: "Check FamilySearch records"
   });
@@ -220,7 +220,7 @@ FindAGraveMemorial.onSetup(findagrave => {
   }
 
   const button = findagrave.createButton({
-    href: FamilySearchQuery.tree(findagrave).url,
+    href: FamilySearchQuery("search/tree/results", findagrave).url,
     innerText: 'Tree Search',
     title: 'Check FamilySearch trees'
   });
@@ -233,7 +233,7 @@ FindAGraveMemorial.onSetup(findagrave => {
 //
 // As FamilySearch's record and tree search forms (maybe others?) take the same
 // query arguments, we use `rootUrl` to specify which type of query to build.
-const FamilySearchQueryBuilder = (urlPath, memorial) => {
+const FamilySearchQuery = (urlPath, memorial) => {
   const rootUrl = `https://www.familysearch.org/${urlPath}`;
 
   // These consts map FindAGrave attributes to FamilySearch query values,
@@ -261,15 +261,6 @@ const FamilySearchQueryBuilder = (urlPath, memorial) => {
   if (surname != surname1) query.push(`q.surname.1=${surname1}`);
 
   return { url: `${rootUrl}?${query.join("&")}` }
-};
-
-const FamilySearchQuery = {
-  record(findagrave) {
-    return FamilySearchQueryBuilder("search/record/results", findagrave)
-  },
-  tree(findagrave) {
-    return FamilySearchQueryBuilder("search/tree/results", findagrave)
-  }
 };
 
 // The global `findagrave` object, which the findagrave.com page gives us,
