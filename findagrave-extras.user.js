@@ -27,17 +27,6 @@ class FindAGraveMemorial {
 
   get findagrave() { return this.document.findagrave }
 
-  // This returns an Array of elements on the page that have an "itemprop"
-  // attribute that has a corresponding `findagrave` object property.
-  // See addClickToCopyForInfoItems() for how it's used.
-  get infoItems() {
-    const elements = Array.from(this.document.querySelectorAll('.mem-events *[itemprop]'));
-    const self = this;
-    return elements.filter(el => {
-      return self.findagrave.hasOwnProperty(el.getAttribute('itemprop'));
-    });
-  }
-
   // A helper to create a link (<a>) element with arbitrary attributes.
   createLink(opt) {
     opt ||= {};
@@ -160,7 +149,14 @@ FindAGraveMemorial.onSetup(findagrave => {
   // to the clipboard when clicked. For example, this makes it so when clicking
   // the death date, it copies that date (in "DD Mon YYYY" format) to the clipboard.
 
-  for (const element of findagrave.infoItems) {
+  // infoItems are elements on the page that have an "itemprop"
+  // attribute that has a corresponding `findagrave` object property
+  const elements = findagrave.document.querySelectorAll('.mem-events *[itemprop]');
+  const infoItems = Array.from(elements).filter(el => {
+    return findagrave.hasOwnProperty(el.getAttribute('itemprop'));
+  });
+
+  for (const element of infoItems) {
     element.addEventListener("click", event => {
       const val = findagrave[element.getAttribute("itemprop")];
       findagrave.clipboard.writeText(val);
