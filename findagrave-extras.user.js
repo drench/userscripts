@@ -265,20 +265,19 @@ const FamilySearchQueryBuilder = (urlPath, memorial) => {
 };
 
 const FamilySearchQuery = {
-  record: (findagrave) => {
+  record(findagrave) {
     return FamilySearchQueryBuilder("search/record/results", findagrave)
   },
-  tree: (findagrave) => {
+  tree(findagrave) {
     return FamilySearchQueryBuilder("search/tree/results", findagrave)
   }
 };
 
-// Given a FinaAGrave memorial ID (derived from the FindAGraveMemorial object
-// passed into the constructor), this builds a query URL for this memorial on
+// Given a FinaAGrave memorial ID, this builds a query URL for the memorial on
 // FamilySearh. The idea being, this takes you directly to the FindAGrave record
 // for easy attachment to a person on FamilySearch.
 const FamilySearchFindAGraveQuery = {
-  url: (memorialId) => {
+  url(memorialId) {
     const rootUrl = "https://www.familysearch.org/search/record/results";
     const collectionId = "2221801";
 
