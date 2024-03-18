@@ -44,13 +44,10 @@ class UpdateUrlOnScroll {
     this.currentAnchor = undefined;
   }
 
-  get anchorElements() {
-    return Array.from(this.window.document.querySelectorAll("div[id^=method-].method-detail"));
-  }
-
   get topAnchors() {
-    return(this
-      .anchorElements
+    const anchorElements = Array.from(this.window.document.querySelectorAll("div[id^=method-].method-detail"));
+
+    return(anchorElements
       .map(e => ({ "el": e, "top": e.getBoundingClientRect().top }))
       .sort((a, b) => {
         if (a.top > b.top) return 1;
@@ -62,12 +59,12 @@ class UpdateUrlOnScroll {
     );
   }
 
-  get topAnchor() { return this.topAnchors[0] }
-
   setup() {
     const updateHeading = function () {
-      if (this.topAnchor && this.currentAnchor != this.topAnchor) {
-        this.currentAnchor = this.topAnchor;
+      const topAnchor = this.topAnchors[0];
+
+      if (topAnchor && this.currentAnchor != topAnchor) {
+        this.currentAnchor = topAnchor;
         this.window.history.pushState(null, null, `#${this.currentAnchor.id}`);
       }
       else if (this.currentAnchor && this.window.scrollY == 0) {
