@@ -7,21 +7,14 @@
 // ==/UserScript==
 
 const RubyDocExtras = {
-  setupClasses: [],
-  onSetup(klass) { this.setupClasses.push(klass) },
+  setupFunctions: [],
+  onSetup(klass) { this.setupFunctions.push(klass) },
   setup(win) {
-    for (const klass of this.setupClasses) {
-      if (klass.setup) {
-        console.log("NEW STYLE", klass);
-        klass.setup.bind(win).call();
-      }
-      else {
-        console.log("OLD STYLE", klass);
-        (new klass(win)).setup();
-      }
+    for (const fn of this.setupFunctions) {
+      fn.setup.bind(win).call();
     }
   }
-}
+};
 
 // Make the "action bar" stick to the top of the page
 const AnchorActionBar = {
@@ -58,6 +51,10 @@ class UpdateUrlOnScroll {
       .map(a => a.el)
     );
   }
+
+  static setup() {
+    (new UpdateUrlOnScroll(this)).setup();
+  };
 
   setup() {
     const updateHeading = function () {
