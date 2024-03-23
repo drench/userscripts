@@ -5,7 +5,7 @@
 // @supportURL  https://github.com/drench/userscripts
 // @match       https://www.findagrave.com/memorial/*/*
 // @run-at      document-idle
-// @version     1.0.2
+// @version     1.0.3
 // ==/UserScript==
 
 class FindAGraveMemorial {
@@ -48,15 +48,11 @@ class FindAGraveMemorial {
   // a string trimmed of whitespace, or an empty string if the property does not
   // exist, or if the property value is not a string.
   getPropertyPresence(property) {
-    if (!this.isValid()) return '';
+    if (!this.findagrave) return ''; // everything breaks if we don't have this
     if (!this.findagrave.hasOwnProperty(property)) return '';
     if (typeof(this.findagrave[property]) != 'string') return '';
     return this.findagrave[property].trim();
   }
-
-  // If there is no `findagrave` object, everything breaks.
-  // Check the result of this method before trying anything.
-  isValid() { return !!this.findagrave }
 
   // Returns the birthplace as a string, if it's available.
   // If it's not, it returns a falsy value.
@@ -120,7 +116,7 @@ class FindAGraveMemorial {
       Array.from(
         new Set(
           Array.from(this.seeMoreMemorialLinks)
-            .map(a => (new URL(a).searchParams.get("lastname")))
+            .map(a => (new URL(a)).searchParams.get("lastname"))
         )
       )
     );
