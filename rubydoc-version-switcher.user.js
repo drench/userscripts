@@ -38,7 +38,7 @@ class UpdateUrlOnScroll {
   }
 
   get topAnchors() {
-    const anchorElements = Array.from(this.window.document.querySelectorAll("div[id^=method-].method-detail"));
+    const anchorElements = Array.from(this.window.document.querySelectorAll("div.method-detail"));
 
     return(anchorElements
       .map(e => ({ "el": e, "top": e.getBoundingClientRect().top }))
