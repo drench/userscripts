@@ -3,7 +3,7 @@
 // @description   Adds a version-switcher widget and other extras to ruby-doc.org
 // @match         https://ruby-doc.org/*
 // @run-at        document-idle
-// @version       1.0.0
+// @version       1.0.1
 // ==/UserScript==
 
 const RubyDocExtras = {
@@ -29,6 +29,28 @@ const AnchorActionBar = {
   }
 };
 RubyDocExtras.onSetup(AnchorActionBar);
+
+// If we're on an outdated (old style) doc page, add a link to the current page
+const LinkToUpdatedDocs = {
+  setup() {
+    const doc = this.document;
+    const url = new URL(doc.location.href)
+    if (url.pathname.indexOf("/core-") != 0) return;
+
+    const actionbar = doc.querySelector("div#actionbar ul.grids.g0");
+    if (!actionbar) return;
+
+    const li = doc.createElement("li");
+    li.className = "grid-2";
+    const link = doc.createElement("a");
+    link.innerText = "Current";
+    url.pathname = url.pathname.replace("^/core-.+/", "/core/");
+    link.href = url.toString();
+    li.appendChild(link);
+    actionbar.appendChild(li);
+  }
+};
+RubyDocExtras.onSetup(LinkToUpdatedDocs);
 
 // Update the URL with the current anchor when scrolling
 class UpdateUrlOnScroll {
