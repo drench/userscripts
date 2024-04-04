@@ -2,6 +2,7 @@
 // @name          Ruby Doc Extras
 // @description   Adds a version-switcher widget and other extras to ruby-doc.org
 // @match         https://ruby-doc.org/*
+// @match         https://docs.ruby-lang.org/*
 // @run-at        document-idle
 // @version       1.0.1
 // ==/UserScript==
@@ -155,7 +156,9 @@ const fetchVersions = async (win) => {
   storage.setItem('ruby-versions', JSON.stringify(current));
   return current;
 }
-RubyVersionSelector.versions = await fetchVersions(window);
+
+if (document.location.hostname == "ruby-doc.org")
+  RubyVersionSelector.versions = await fetchVersions(window);
 
 RubyDocExtras.onSetup(RubyVersionSelector);
 
