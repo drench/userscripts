@@ -4,7 +4,7 @@
 // @match         https://ruby-doc.org/*
 // @match         https://docs.ruby-lang.org/*
 // @run-at        document-idle
-// @version       1.0.2
+// @version       1.0.3
 // ==/UserScript==
 
 const RubyDocExtras = {
@@ -109,7 +109,7 @@ const ScrollToAnchor = {
     const anchor = this.document.getElementById(anchorId);
     if (! anchor) return;
     anchor.scrollIntoView();
-    this.scrollByLines(-3);
+    this.scrollBy(0, -30);
   }
 };
 RubyDocExtras.onSetup(ScrollToAnchor);
