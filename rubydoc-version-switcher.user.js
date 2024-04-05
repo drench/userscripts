@@ -4,7 +4,7 @@
 // @match         https://ruby-doc.org/*
 // @match         https://docs.ruby-lang.org/*
 // @run-at        document-idle
-// @version       1.0.1
+// @version       1.0.2
 // ==/UserScript==
 
 const RubyDocExtras = {
@@ -102,6 +102,18 @@ class UpdateUrlOnScroll {
 }
 RubyDocExtras.onSetup(UpdateUrlOnScroll);
 
+const ScrollToAnchor = {
+  setup() {
+    const anchorId = this.location.hash.slice(1);
+    if (anchorId.length == 0) return;
+    const anchor = this.document.getElementById(anchorId);
+    if (! anchor) return;
+    anchor.scrollIntoView();
+    this.scrollByLines(-3);
+  }
+};
+RubyDocExtras.onSetup(ScrollToAnchor);
+
 const RubyVersionSelector = {
   setup() {
     const doc = this.document;
@@ -157,8 +169,9 @@ const fetchVersions = async (win) => {
   return current;
 }
 
-if (document.location.hostname == "ruby-doc.org")
+if (document.location.hostname == "ruby-doc.org") {
   RubyVersionSelector.versions = await fetchVersions(window);
+}
 
 RubyDocExtras.onSetup(RubyVersionSelector);
 
