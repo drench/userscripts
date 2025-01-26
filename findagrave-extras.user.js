@@ -5,7 +5,7 @@
 // @supportURL  https://github.com/drench/userscripts
 // @match       https://www.findagrave.com/memorial/*/*
 // @run-at      document-idle
-// @version     1.0.3
+// @version     1.0.4
 // ==/UserScript==
 
 class FindAGraveMemorial {
@@ -88,7 +88,9 @@ class FindAGraveMemorial {
   // Returns the last name at birth, if there's a maidenName available.
   // Otherwise, it returns the lastName. This of course may not be the actual
   // birth name, but it's the best we can do.
-  get lastNameAtBirth() { return this.maidenName ?? this.lastName }
+  get lastNameAtBirth() {
+    return this.originalLastName ?? this.maidenName ?? this.lastName;
+  }
 
   // Returns what we believe to the the last name at death, which we are
   // assuming is the same as the lastName (it's the best guess we've got).
@@ -99,6 +101,31 @@ class FindAGraveMemorial {
   // for women, but it's not guaranteed.
   get maidenName() {
     return this.potentialSurnames.find(n => n && n != this.lastName)
+  }
+
+  // This returns the "original name" as displayed on the page, if it's there,
+  // or a falsy value if it's not. This is common for musicians, actors, writers,
+  // etc. who used stage names or pen names.
+  // Example: https://www.findagrave.com/memorial/21388/frankie-carle
+  get originalName() {
+    const element = Array.from(document.querySelectorAll("dt")).find(dt => dt.innerText == "ORIGINAL NAME")
+    if (!element) return false;
+    return element.nextSibling?.innerText;
+  }
+
+  get originalFirstName() {
+    const oName = this.originalName;
+    if (!oName) return;
+    let nameParts = oName.split(/\s+/);
+    if (nameParts.length > 1) nameParts.pop(); // lose the surname
+    return nameParts.join(" ");
+  }
+
+  get originalLastName() {
+    const oName = this.originalName;
+    if (!oName) return;
+    let nameParts = oName.split(/\s+/);
+    return nameParts.pop();
   }
 
   // The page has a list of search links of potentially related people, and
@@ -237,7 +264,7 @@ const FamilySearchQuery = (urlPath, memorial) => {
   const birthLikeDate = memorial.birthYear ?? '';
   const deathLikePlace = encodeURI(memorial.deathPlace ?? '');
   const deathLikeDate = memorial.deathYear ?? '';
-  const givenName = encodeURI(memorial.firstName ?? '');
+  const givenName = encodeURI(memorial.originalFirstName ?? memorial.firstName ?? '');
   const surname = encodeURI(memorial.lastNameAtBirth ?? '');
   const surname1 = encodeURI(memorial.lastNameAtDeath ?? '');
 
