@@ -61,8 +61,12 @@ class FindAGraveMemorial {
     return birthLocationLabel?.innerText;
   }
 
-  // Returns the birth year as an integer
-  get birthYear() { return parseInt(this.findagrave.birthYear, 10) }
+  // Returns the birth year as an integer or empty string if not parseable
+  get birthYear() {
+    let year = parseInt(this.findagrave.birthYear, 10);
+    if (isNaN(year)) year = "";
+    return year;
+  }
 
   // Returns the page element containing the buttons ("SHARE", "SAVE TO", etc.)
   get buttonContainer() {
@@ -76,8 +80,12 @@ class FindAGraveMemorial {
     return deathLocationLabel?.innerText;
   }
 
-  // Returns the death year as an integer
-  get deathYear() { return parseInt(this.findagrave.deathYear, 10) }
+  // Returns the death year as an integer or empty string if not parseable
+  get deathYear() {
+    let year = parseInt(this.findagrave.deathYear, 10)
+    if (isNaN(year)) year = "";
+    return year;
+  }
 
   // Returns the first name as a string, or an empty string if it's not available.
   get firstName() { return this.getPropertyPresence('firstName') }
@@ -261,9 +269,9 @@ const FamilySearchQuery = (urlPath, memorial) => {
   // These consts map FindAGrave attributes to FamilySearch query values,
   // encoding where necessary:
   const birthLikePlace = encodeURI(memorial.birthPlace ?? '');
-  const birthLikeDate = memorial.birthYear ?? '';
+  const birthLikeDate = memorial.birthYear;
   const deathLikePlace = encodeURI(memorial.deathPlace ?? '');
-  const deathLikeDate = memorial.deathYear ?? '';
+  const deathLikeDate = memorial.deathYear;
   const givenName = encodeURI(memorial.originalFirstName ?? memorial.firstName ?? '');
   const surname = encodeURI(memorial.lastNameAtBirth ?? '');
   const surname1 = encodeURI(memorial.lastNameAtDeath ?? '');
